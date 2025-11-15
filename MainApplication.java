@@ -27,7 +27,8 @@ public class MainApplication extends JFrame {
 
     public static void main(String[] args) {
         // Run the GUI on the Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> new MainApplication());
+        //SwingUtilities.invokeLater(() -> new MainApplication());
+        new MainApplication();
     }
 
     public MainApplication() {

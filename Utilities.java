@@ -37,13 +37,12 @@ interface MyConstants {
 
     // --- NEW: Define the panel sizes ---
     // We reserve space for the top, bottom, and side panels
-    static final int NORTH_PANEL_HEIGHT = 120; // Approx. height of your 3-row north panel
     static final int SOUTH_PANEL_HEIGHT = 100; // Approx. height of your 2-row south panel
     static final int EAST_PANEL_WIDTH = 250;   // Approx. width of your JTextArea log
     
     // --- NEW: Define the *actual* game area size ---
     static final int GAME_PANEL_WIDTH = FRAME_WIDTH - EAST_PANEL_WIDTH; // 1200 - 250 = 950
-    static final int GAME_PANEL_HEIGHT = FRAME_HEIGHT - NORTH_PANEL_HEIGHT - SOUTH_PANEL_HEIGHT; // 800 - 120 - 100 = 580
+    static final int GAME_PANEL_HEIGHT = FRAME_HEIGHT - SOUTH_PANEL_HEIGHT; // 800 - 120 - 100 = 580
 
     static final int ROCKET_WIDTH = 80;
     static final int ROCKET_HEIGHT = 100;
@@ -57,7 +56,7 @@ interface MyConstants {
     static final int ASTEROID_SPEED = 5; // Pixels per game tick
     static final int BULLET_SPEED = 15; // Pixels per game tick
     static final int ASTEROID_SPAWN_DELAY = 3000; // Milliseconds (3 seconds)
-    static final int PLAYER_FIRE_DELAY = 500; // Millis (2 shots per second)
+    static final int PLAYER_FIRE_DELAY = 100; // n millisec / 500 Millis (2 shots per second)
     static final int UPGRADE_SPEED_AMOUNT = 5; // Speed increase per upgrade
 
     // --- Upgrade Costs ---

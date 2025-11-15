@@ -26,6 +26,7 @@ class PlayerRocket extends JLabel {
         rocketImg = new MyImageIcon(MyConstants.FILE_ROCKET).resize(MyConstants.ROCKET_WIDTH, MyConstants.ROCKET_HEIGHT);
         setIcon(rocketImg);
 
+        // This calculation now uses the CORRECTED GAME_PANEL_HEIGHT (700px)
         curX = (MyConstants.GAME_PANEL_WIDTH - MyConstants.ROCKET_WIDTH) / 2;
         curY = MyConstants.GAME_PANEL_HEIGHT - MyConstants.ROCKET_HEIGHT - 20;
         setBounds(curX, curY, MyConstants.ROCKET_WIDTH, MyConstants.ROCKET_HEIGHT);
@@ -67,8 +68,26 @@ class Asteroid extends JLabel implements Runnable {
         setBounds(curX, curY, MyConstants.ASTEROID_WIDTH, MyConstants.ASTEROID_HEIGHT);
     }
 
-    public void stopThread() {
+    /**
+     * COMMAND A: "Destroyed by Bullet"
+     * This is called by checkBulletCollisions.
+     * It *only* stops the thread's loop.
+     * The GameFrame is responsible for removing the GUI and List item.
+     */
+    public void stopThreadOnly() {
         isRunning = false;
+        // It no longer calls any parentFrame methods.
+        // It just stops its own loop.
+    }
+
+    /**
+     * COMMAND B: "Died on its Own"
+     * This is called by the asteroid itself (hits ground/player).
+     * It tells GameFrame to do a "full" removal.
+     */
+    public void stopThreadAndRemoveFromList() {
+        isRunning = false;
+        // This tells GameFrame to remove it from the list AND the GUI
         parentFrame.removeEntity(this);
     }
     
@@ -84,14 +103,15 @@ class Asteroid extends JLabel implements Runnable {
 
             if (isRunning && this.getBounds().intersects(parentFrame.getPlayerRocket().getBounds())) {
                 parentFrame.loseHealth(1);
-                stopThread();
+                stopThreadAndRemoveFromList(); // Use the full remove method
                 break;
             }
 
+            // This check now uses the CORRECTED GAME_PANEL_HEIGHT (700px)
             if (curY > MyConstants.GAME_PANEL_HEIGHT) {
                 parentFrame.addGameLog("Asteroid missed.");
                 parentFrame.loseHealth(1);
-                stopThread();
+                stopThreadAndRemoveFromList(); // Use the full remove method
                 break;
             }
 

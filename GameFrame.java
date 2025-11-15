@@ -1,5 +1,12 @@
-
-package Project3_6713118_V2;
+/*
+ * Group Members:
+ * 1. [Your Name] ([Your ID])
+ * 2. [Name] ([ID])
+ * 3. [Name] ([ID])
+ * 4. [Name] ([ID])
+ * 5. [Name] ([ID])
+ */
+package Project3_6713118_V2; // Make sure to rename XXX to your ID
 
 import java.awt.*;
 import java.awt.event.*;
@@ -19,7 +26,7 @@ public class GameFrame extends JFrame {
     private MyImageIcon backgroundImg;
     private GameFrame currentFrame; // Renamed from MainApplication
     private PlayerRocket playerRocket;
-    private MySoundEffect themeSound;
+    //private MySoundEffect themeSound;
     private Random rand = new Random();
 
     // --- Game State ---
@@ -27,13 +34,19 @@ public class GameFrame extends JFrame {
     private int playerHP = 3;
     private volatile boolean gameRunning = true;
     private String playerName; // Store player name from menu
-    private String difficulty; // Store difficulty from menu
+    private String difficulty;
 
     // --- Upgradeable Stats ---
     private int currentBulletSpeed = MyConstants.BULLET_SPEED;
     private int currentPlayerSpeed = MyConstants.PLAYER_SPEED;
     private boolean hasDoubleShot = false;
     private boolean hasShield = false;
+    
+    // --- FIX 1: Pre-load all sounds to crush Sound I/O lag ---
+    private MySoundEffect themeSound;
+    private MySoundEffect laserSound;
+    private MySoundEffect explosionSound;
+    private MySoundEffect playerHitSound;
 
     // --- Thread Management ---
     private List<Thread> entityThreads = new ArrayList<>();
@@ -51,7 +64,7 @@ public class GameFrame extends JFrame {
     private JTextField hpText;
     private JLabel playerLabel; // To show player's name
 
-
+    // NO main() method here anymore.
 
     // Constructor now accepts settings from the menu
     public GameFrame(String playerName, String difficulty) {
@@ -85,6 +98,9 @@ public class GameFrame extends JFrame {
 
         // Start the game logic
         themeSound = new MySoundEffect(MyConstants.FILE_THEME_MUSIC);
+        laserSound = new MySoundEffect(MyConstants.FILE_LASER_SOUND);
+        explosionSound = new MySoundEffect(MyConstants.FILE_EXPLOSION_SOUND);
+        playerHitSound = new MySoundEffect(MyConstants.FILE_PLAYER_HIT_SOUND);
         themeSound.playLoop();
 
         // Start game threads
@@ -95,6 +111,7 @@ public class GameFrame extends JFrame {
     public void AddComponents() {
 
         // --- CENTER: The Game Draw Pane ---
+        // This line now uses the CORRECTED GAME_PANEL_HEIGHT (700px)
         backgroundImg = new MyImageIcon(MyConstants.FILE_BACKGROUND).resize(MyConstants.GAME_PANEL_WIDTH, MyConstants.GAME_PANEL_HEIGHT);
         drawpane = new JLabel();
         drawpane.setIcon(backgroundImg);
@@ -289,7 +306,7 @@ public class GameFrame extends JFrame {
 
     // --- Game Logic Methods ---
 
-    public void spawnAsteroid() {
+    public synchronized void spawnAsteroid() {
         if (!gameRunning) return;
         
         Asteroid asteroid = new Asteroid(currentFrame, rand.nextInt(MyConstants.GAME_PANEL_WIDTH - MyConstants.ASTEROID_WIDTH));
@@ -305,8 +322,8 @@ public class GameFrame extends JFrame {
     public void fireBullet() {
         if (!gameRunning) return;
 
-        MySoundEffect fireSound = new MySoundEffect(MyConstants.FILE_LASER_SOUND);
-        fireSound.playOnce();
+       // MySoundEffect fireSound = new MySoundEffect(MyConstants.FILE_LASER_SOUND);
+        laserSound.playOnce();
 
         if (hasDoubleShot) {
             int bulletX1 = playerRocket.getX() + (MyConstants.ROCKET_WIDTH / 4) - (MyConstants.BULLET_WIDTH / 2);
@@ -352,16 +369,27 @@ public class GameFrame extends JFrame {
             Asteroid asteroid = iter.next();
             if (asteroid.isRunning() && bullet.getBounds().intersects(asteroid.getBounds())) {
                 // Collision!
-                MySoundEffect hitSound = new MySoundEffect(MyConstants.FILE_EXPLOSION_SOUND);
-                hitSound.playOnce();
+//                MySoundEffect hitSound = new MySoundEffect(MyConstants.FILE_EXPLOSION_SOUND);
+//                hitSound.playOnce();
+                explosionSound.playOnce();
                 
                 bullet.stopThread();    // Stop and remove bullet
-                asteroid.stopThread();  // Stop and remove asteroid
                 
+                // --- THE CORRECT FIX IS HERE ---
+                // 1. Tell the asteroid thread to STOP, but do nothing else.
+                asteroid.stopThreadOnly(); 
+                
+                // 2. YOU (GameFrame) remove its visuals from the screen.
+                removeEntityGUI(asteroid); // Call our new, specialized method
+                
+                // 3. The iterator (the "Scout") removes it from the *list*.
+                iter.remove(); 
+                // --- END FIX ---
+
                 addScore(10);           // Add score
                 addGameLog("Asteroid destroyed! +10");
                 
-                iter.remove(); // Remove asteroid from list
+                // iter.remove(); // <-- OLD POSITION, REMOVED
                 return; // Bullet is destroyed, stop checking
             }
         }
@@ -436,14 +464,32 @@ public class GameFrame extends JFrame {
         return currentPlayerSpeed;
     }
 
-    // Methods for entities to remove themselves from the game
-    public synchronized void removeEntity(JLabel entity) {
+    // --- NEW SPECIALIZED METHOD ---
+    /**
+     * This method ONLY removes the JLabel from the drawpane.
+     * It is "GUI-safe" and does NOT touch any of the underlying data lists.
+     * This is safe to call from anywhere, even inside an iterator,
+     * because it doesn't modify the list being iterated.
+     */
+    public synchronized void removeEntityGUI(JLabel entity) {
         SwingUtilities.invokeLater(() -> {
             drawpane.remove(entity);
             drawpane.revalidate();
             drawpane.repaint();
         });
+    }
 
+    /**
+     * This is the "full" remove method.
+     * It removes an entity from the GUI *and* its tracking list.
+     * This is called when an entity dies "on its own" (hits ground, player, etc.)
+     * IT MUST NOT be called from inside an iterator loop.
+     */
+    public synchronized void removeEntity(JLabel entity) {
+        // 1. Remove the visuals
+        removeEntityGUI(entity); 
+        
+        // 2. Remove from the data list
         if (entity instanceof Asteroid) {
             asteroids.remove((Asteroid) entity);
         } else if (entity instanceof Bullet) {
