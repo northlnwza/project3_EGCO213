@@ -6,7 +6,7 @@
  * 4. [Name] ([ID])
  * 5. [Name] ([ID])
  */
-package Project3_6713118_V2; // Make sure to rename XXX to your ID
+package Project3_6713118; // Make sure to rename XXX to your ID
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
