@@ -6,9 +6,11 @@
  * 4. [Name] ([ID])
  * 5. [Name] ([ID])
  */
+
 package Project3_6713118; // Make sure to rename XXX to your ID
 
-import javax.swing.JLabel;
+//import Project3_EGCO213.GameFrame;
+import javax.swing.*;
 
 // This file contains all our "game object" classes.
 // All references to "MainApplication" have been changed to "GameFrame".

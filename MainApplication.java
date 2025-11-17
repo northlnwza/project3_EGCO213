@@ -6,171 +6,176 @@
  * 4. [Name] ([ID])
  * 5. [Name] ([ID])
  */
-package Project3_6713118; // Make sure to rename XXX to your ID
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+
+package Project3_6713118;
+
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
+import javax.swing.*;
 
-// This is NOW Frame 1, the Main Menu.
-// It satisfies the PDF requirement that the program starts with "MainApplication.java".
-public class MainApplication extends JFrame {
+class MainApplication extends JFrame 
+{
+    // components
+    private JPanel             contentpane;
+    private JLabel             drawpane;
+    private MyImageIcon        main_backgroundImg;    
+    private MySoundEffect      clickedSound;    
+    private MainApplication    currentFrame;
+    private MySoundEffect      backgroundMusic;
+    private VolumeManagement   vmBackground;
+//    private VolumeManagement   vmClicked;
 
-    // (Req #2) Components
-    private JTextField playerNameField;
-    private JRadioButton[] difficultyRadios;
-    private JComboBox<String> musicComboBox;
-    private JSlider volumeSlider;
-    private JButton startGameButton;
+    private int framewidth  = MyConstants.FRAME_WIDTH;
+    private int frameheight = MyConstants.FRAME_HEIGHT;
 
-    public static void main(String[] args) {
-        // Run the GUI on the Event Dispatch Thread
-        //SwingUtilities.invokeLater(() -> new MainApplication());
+    public static void main(String[] args) 
+    {
         new MainApplication();
-    }
+    }  
+    
 
-    public MainApplication() {
-        setTitle("Space Defender - Main Menu");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 600);
+    //--------------------------------------------------------------------------
+    public MainApplication()
+    {   
+        vmBackground = new VolumeManagement();
+        backgroundMusic = new MySoundEffect();
+        backgroundMusic.setSound(MyConstants.FILE_RetroSound);
+        backgroundMusic.playLoop();
+        backgroundMusic.setVolume(0.5f);
+        
+        setTitle("Space Fighter");
+	setSize(framewidth, frameheight); 
         setLocationRelativeTo(null);
-        setResizable(false);
+	setVisible(true);
+	setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
+        currentFrame = this;
+
+	contentpane = (JPanel)getContentPane();
+	contentpane.setLayout(new BorderLayout());        
+        AddComponents();
+    } 
+
+    
+    //--------------------------------------------------------------------------
+    public void AddComponents()
+    {    
+        clickedSound = new MySoundEffect();
+        clickedSound.setSound(MyConstants.FILE_CLICKED);
         
-        // Main panel with a nice border
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        add(mainPanel);
-
-        // --- Title ---
-        JLabel titleLabel = new JLabel("SPACE DEFENDER");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(titleLabel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        // --- (Req #2) Group Names ---
-        JLabel namesLabel = new JLabel("By: [Your Name] (ID), [Friend's Name] (ID), ...");
-        namesLabel.setFont(new Font("Arial", Font.ITALIC, 12));
-        namesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(namesLabel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
-
-        // --- (Req #2) JTextField ---
-        mainPanel.add(createSectionLabel("Enter Your Name:"));
-        playerNameField = new JTextField("Commander");
-        playerNameField.setMaximumSize(new Dimension(300, 30));
-        mainPanel.add(playerNameField);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+	main_backgroundImg  = new MyImageIcon(MyConstants.FILE_BG);
+	drawpane = new JLabel();
+	drawpane.setIcon(main_backgroundImg);
+        drawpane.setLayout(new BorderLayout());
         
-        // --- (Req #2) JRadioButton (5+ items) ---
-        mainPanel.add(createSectionLabel("Select Difficulty:"));
-        String[] difficulties = {"Recruit", "Soldier", "Veteran", "Ace", "Impossible"};
-        difficultyRadios = new JRadioButton[difficulties.length];
-        ButtonGroup difficultyGroup = new ButtonGroup();
-        JPanel radioPanel = new JPanel(new GridLayout(3, 2));
-        radioPanel.setMaximumSize(new Dimension(300, 100));
-        for (int i = 0; i < difficulties.length; i++) {
-            difficultyRadios[i] = new JRadioButton(difficulties[i]);
-            difficultyGroup.add(difficultyRadios[i]);
-            radioPanel.add(difficultyRadios[i]);
-        }
-        difficultyRadios[1].setSelected(true); // Default to "Soldier"
-        mainPanel.add(radioPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        // --- (Req #2) JComboBox (5+ items) ---
-        mainPanel.add(createSectionLabel("Select Music Track:"));
-        String[] musicTracks = {
-            "Cosmic Odyssey", 
-            "Starlight Battle", 
-            "Nebula Drift", 
-            "Void Ambience", 
-            "Silent Operations"
-        };
-        musicComboBox = new JComboBox<>(musicTracks);
-        musicComboBox.setMaximumSize(new Dimension(300, 30));
-        mainPanel.add(musicComboBox);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        // --- (Req #2) Extra Component (JSlider) ---
-        mainPanel.add(createSectionLabel("Master Volume:"));
-        volumeSlider = new JSlider(0, 100, 75);
-        volumeSlider.setMajorTickSpacing(25);
-        volumeSlider.setPaintTicks(true);
-        volumeSlider.setPaintLabels(true);
-        volumeSlider.setMaximumSize(new Dimension(300, 60));
-        mainPanel.add(volumeSlider);
+        JLabel logo = new JLabel();
+        JButton playBtn = new JButton();
+        JButton settingBtn = new JButton();
+        JButton aboutusBtn = new JButton();
+        JButton howtoplayBtn = new JButton();
         
-        // (Req #3) Event Handler 1 (ChangeListener)
-        volumeSlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                // This is a substantial handler, it could control volume
-                System.out.println("Volume set to: " + volumeSlider.getValue());
-            }
-        });
+        logo.setIcon(new MyImageIcon(MyConstants.FILE_GameLogo));
+        playBtn.setIcon(new MyImageIcon(MyConstants.FILE_Play));
+        settingBtn.setIcon(new MyImageIcon(MyConstants.FILE_Setting));
+        aboutusBtn.setIcon(new MyImageIcon(MyConstants.FILE_Credits));
+        howtoplayBtn.setIcon(new MyImageIcon(MyConstants.FILE_Howto));
         
-        mainPanel.add(Box.createVerticalGlue()); // Pushes start button to bottom
+        RemoveBG.removeBgBtn(playBtn); RemoveBG.removeBgBtn(settingBtn); RemoveBG.removeBgBtn(aboutusBtn); RemoveBG.removeBgBtn(howtoplayBtn);
+              
+        JPanel mainMenu = new JPanel();
+        mainMenu.setLayout(new BoxLayout(mainMenu, BoxLayout.Y_AXIS));
+        mainMenu.add(Box.createRigidArea(new Dimension(0, 100)));
+        mainMenu.add(logo);
+        mainMenu.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainMenu.add(playBtn);
+        mainMenu.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainMenu.add(settingBtn);
+        mainMenu.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainMenu.add(howtoplayBtn);
+        mainMenu.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainMenu.add(aboutusBtn);
+        
+        logo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        playBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        settingBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        howtoplayBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        aboutusBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // --- (Req #2) JButton that opens another frame ---
-        startGameButton = new JButton("START GAME");
-        startGameButton.setFont(new Font("Arial", Font.BOLD, 24));
-        startGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        startGameButton.setMinimumSize(new Dimension(300, 60));
-        startGameButton.setPreferredSize(new Dimension(300, 60));
-
-        // (Req #3) Event Handler 2 & 3 (ActionListener & MouseEvent)
-        startGameButton.addActionListener(e -> {
-            // This is the logic that opens Frame 2
-            String playerName = playerNameField.getText();
-            String selectedDifficulty = getSelectedDifficulty();
-            
-            // Create and show the game frame
-            GameFrame gameFrame = new GameFrame(playerName, selectedDifficulty);
-            gameFrame.setVisible(true);
-            
-            // Close this menu frame
-            this.dispose();
-        });
-
-        // (Req #3) This satisfies the MouseEvent handler requirement
-        startGameButton.addMouseListener(new MouseAdapter() {
+        
+        playBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                // Substantial: change button appearance
-                startGameButton.setBackground(Color.GREEN);
+                playBtn.setIcon(new MyImageIcon(MyConstants.FILE_Play_Glow));
             }
-            @Override
             public void mouseExited(MouseEvent e) {
-                // Substantial: revert button appearance
-                startGameButton.setBackground(UIManager.getColor("Button.background"));
+                playBtn.setIcon(new MyImageIcon(MyConstants.FILE_Play));
+            }
+        });
+        playBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clickedSound.playOnce();
+                currentFrame.setVisible(false);
+                new GameMain(currentFrame);
             }
         });
         
-        mainPanel.add(startGameButton);
-
-        // Show the frame
-        setVisible(true);
-    }
-    
-    // Helper to get selected radio button
-    private String getSelectedDifficulty() {
-        for (JRadioButton radio : difficultyRadios) {
-            if (radio.isSelected()) {
-                return radio.getText();
+        settingBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                settingBtn.setIcon(new MyImageIcon(MyConstants.FILE_Setting_Glow));
             }
-        }
-        return "Soldier";
-    }
+            public void mouseExited(MouseEvent e) {
+                settingBtn.setIcon(new MyImageIcon(MyConstants.FILE_Setting));
+            }
+        });
+        settingBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clickedSound.playOnce();
+                currentFrame.setVisible(false);
+                new SettingApplication(currentFrame, backgroundMusic, vmBackground);
+            }
+        });
+        
+        howtoplayBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                howtoplayBtn.setIcon(new MyImageIcon(MyConstants.FILE_Howto_Glow));
+            }
+            public void mouseExited(MouseEvent e) {
+                howtoplayBtn.setIcon(new MyImageIcon(MyConstants.FILE_Howto));
+            }
+        });
+        howtoplayBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clickedSound.playOnce();
+            }
+        });
+        
+        aboutusBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                aboutusBtn.setIcon(new MyImageIcon(MyConstants.FILE_Credits_Glow));
+            }
+            public void mouseExited(MouseEvent e) {
+                aboutusBtn.setIcon(new MyImageIcon(MyConstants.FILE_Credits));
+            }
+        });
+        aboutusBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clickedSound.playOnce();
+            }
+        });
+        mainMenu.setOpaque(false);
+        
+        drawpane.add(mainMenu, BorderLayout.CENTER);
+        contentpane.add(drawpane, BorderLayout.CENTER);
+             
+        validate();       
 
-    // Helper to style section labels
-    private JLabel createSectionLabel(String text) {
-        JLabel label = new JLabel(text);
-        label.setFont(new Font("Arial", Font.BOLD, 16));
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        return label;
-    }
-}
+
+    }    
+
+} // end class MainApplication

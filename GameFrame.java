@@ -25,6 +25,7 @@ public class GameFrame extends JFrame {
     private JLabel drawpane; // This is the "game screen"
     private MyImageIcon backgroundImg;
     private GameFrame currentFrame; // Renamed from MainApplication
+    private JFrame mainFrame;
     private PlayerRocket playerRocket;
     //private MySoundEffect themeSound;
     private Random rand = new Random();
@@ -43,7 +44,6 @@ public class GameFrame extends JFrame {
     private boolean hasShield = false;
     
     // --- FIX 1: Pre-load all sounds to crush Sound I/O lag ---
-    private MySoundEffect themeSound;
     private MySoundEffect laserSound;
     private MySoundEffect explosionSound;
     private MySoundEffect playerHitSound;
@@ -67,7 +67,7 @@ public class GameFrame extends JFrame {
     // NO main() method here anymore.
 
     // Constructor now accepts settings from the menu
-    public GameFrame(String playerName, String difficulty) {
+    public GameFrame(JFrame mainFrame, String playerName, String difficulty) {
         this.playerName = playerName;
         this.difficulty = difficulty;
         this.currentFrame = this;
@@ -81,13 +81,14 @@ public class GameFrame extends JFrame {
         // We add a WindowListener for game shutdown logic.
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosed(WindowEvent e) {
                 gameRunning = false; // Stop all threads
-                themeSound.stop();
                 // Interrupt all running threads
                 for (Thread t : entityThreads) {
                     t.interrupt();
                 }
+                mainFrame.setVisible(true);
+                currentFrame.dispose();
             }
         });
 
@@ -97,11 +98,13 @@ public class GameFrame extends JFrame {
         AddComponents(); // Add all game components
 
         // Start the game logic
-        themeSound = new MySoundEffect(MyConstants.FILE_THEME_MUSIC);
-        laserSound = new MySoundEffect(MyConstants.FILE_LASER_SOUND);
-        explosionSound = new MySoundEffect(MyConstants.FILE_EXPLOSION_SOUND);
-        playerHitSound = new MySoundEffect(MyConstants.FILE_PLAYER_HIT_SOUND);
-        themeSound.playLoop();
+        laserSound = new MySoundEffect();
+        explosionSound = new MySoundEffect();
+        playerHitSound = new MySoundEffect();
+        
+        laserSound.setSound(MyConstants.FILE_LASER_SOUND);
+        explosionSound.setSound(MyConstants.FILE_EXPLOSION_SOUND);
+        playerHitSound.setSound(MyConstants.FILE_PLAYER_HIT_SOUND);
 
         // Start game threads
         startAsteroidSpawner();
@@ -408,23 +411,23 @@ public class GameFrame extends JFrame {
     public synchronized void loseHealth(int amount) {
         if (!gameRunning) return;
         
+         MySoundEffect hitSound = new MySoundEffect();
+         hitSound.setSound(MyConstants.FILE_PLAYER_HIT_SOUND);
+         
         if (hasShield) {
             hasShield = false;
             addGameLog("Shield blocked the hit!");
-            MySoundEffect hitSound = new MySoundEffect(MyConstants.FILE_PLAYER_HIT_SOUND);
             hitSound.playOnce();
             return;
         }
 
         playerHP -= amount;
         hpText.setText(String.valueOf(playerHP));
-        MySoundEffect hitSound = new MySoundEffect(MyConstants.FILE_PLAYER_HIT_SOUND);
         hitSound.playOnce();
         
         if (playerHP <= 0) {
             // Game Over
             gameRunning = false;
-            themeSound.stop();
             addGameLog("GAME OVER. Final Score: " + score);
             
             // Stop all threads
