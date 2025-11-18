@@ -31,7 +31,7 @@ public class GameMain extends JFrame {
 //    }
 
     public GameMain(JFrame mainFrame) {
-        setTitle("Space Defender - Main Menu");
+        setTitle("Space Fighter - Main Menu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 600);
         setLocationRelativeTo(null);
@@ -47,18 +47,18 @@ public class GameMain extends JFrame {
         add(mainPanel);
 
         // --- Title ---
-        JLabel titleLabel = new JLabel("SPACE DEFENDER");
+        JLabel titleLabel = new JLabel("SPACE FIGHTER");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(titleLabel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // --- (Req #2) Group Names ---
-        JLabel namesLabel = new JLabel("By: [Your Name] (ID), [Friend's Name] (ID), ...");
-        namesLabel.setFont(new Font("Arial", Font.ITALIC, 12));
-        namesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(namesLabel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+//        JLabel namesLabel = new JLabel("By: [Your Name] (ID), [Friend's Name] (ID), ...");
+//        namesLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+//        namesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+//        mainPanel.add(namesLabel);
+//        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
 
         // --- (Req #2) JTextField ---
         mainPanel.add(createSectionLabel("Enter Your Name:"));

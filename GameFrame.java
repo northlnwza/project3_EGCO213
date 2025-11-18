@@ -25,7 +25,7 @@ public class GameFrame extends JFrame {
     private JLabel drawpane; // This is the "game screen"
     private MyImageIcon backgroundImg;
     private GameFrame currentFrame; // Renamed from MainApplication
-    private JFrame mainFrame;
+    private JFrame mainFrame;       // Reference to the Main Menu
     private PlayerRocket playerRocket;
     //private MySoundEffect themeSound;
     private Random rand = new Random();
@@ -39,6 +39,7 @@ public class GameFrame extends JFrame {
 
     // --- Upgradeable Stats ---
     private int currentBulletSpeed = MyConstants.BULLET_SPEED;
+    private int currentBulletFrequency = MyConstants.PLAYER_FIRE_DELAY;
     private int currentPlayerSpeed = MyConstants.PLAYER_SPEED;
     private boolean hasDoubleShot = false;
     private boolean hasShield = false;
@@ -59,7 +60,9 @@ public class GameFrame extends JFrame {
     private JButton buyFasterShipButton;
     private JButton buyFasterBulletButton;
     private JButton buyDoubleShotButton;
+    private JButton buyRapidBulletButton;
     private JButton buyShieldButton;
+    private JButton mainMenuButton; // <-- NEW: Button to go back
     private JTextField scoreText;
     private JTextField hpText;
     private JLabel playerLabel; // To show player's name
@@ -68,29 +71,35 @@ public class GameFrame extends JFrame {
 
     // Constructor now accepts settings from the menu
     public GameFrame(JFrame mainFrame, String playerName, String difficulty) {
+        this.mainFrame = mainFrame; // Store reference to main menu
         this.playerName = playerName;
         this.difficulty = difficulty;
         this.currentFrame = this;
 
-        setTitle("Space Defender - " + playerName);
+        setTitle("Space Fighter - " + playerName);
         setSize(MyConstants.FRAME_WIDTH, MyConstants.FRAME_HEIGHT);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Should probably be DISPOSE_ON_CLOSE if main stays open
 
         // (Req #3) We need 4 event handlers.
         // We add a WindowListener for game shutdown logic.
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                gameRunning = false; // Stop all threads
-                // Interrupt all running threads
-                for (Thread t : entityThreads) {
-                    t.interrupt();
-                }
+                stopGame(); // Helper method to stop everything
+                mainFrame.setVisible(true); // Show main menu
+            }
+            @Override
+            public void windowClosing(WindowEvent e) {
+                stopGame();
                 mainFrame.setVisible(true);
-                currentFrame.dispose();
+                // The default close operation is EXIT_ON_CLOSE, so we might need to change that
+                // or just let dispose() handle it if we change default close op.
             }
         });
+        
+        // IMPORTANT: change to DISPOSE so we don't kill the whole app, just this window
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         contentpane = (JPanel) getContentPane();
         contentpane.setLayout(new BorderLayout());
@@ -109,6 +118,14 @@ public class GameFrame extends JFrame {
         // Start game threads
         startAsteroidSpawner();
         startAutoShooter();
+    }
+    
+    // Helper to cleanly stop the game
+    private void stopGame() {
+        gameRunning = false;
+        for (Thread t : entityThreads) {
+            if (t != null && t.isAlive()) t.interrupt();
+        }
     }
 
     public void AddComponents() {
@@ -133,6 +150,8 @@ public class GameFrame extends JFrame {
                     playerRocket.moveLeft();
                 } else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) {
                     playerRocket.moveRight();
+                }else if (keyCode == KeyEvent.VK_ESCAPE) {
+                    currentFrame.dispatchEvent(new WindowEvent(currentFrame, WindowEvent.WINDOW_CLOSING));
                 }
             }
         });
@@ -159,6 +178,14 @@ public class GameFrame extends JFrame {
         scoreText = new JTextField(String.valueOf(score), 6);
         scoreText.setEditable(false);
         statusPanel.add(scoreText);
+        
+        // --- NEW: Main Menu Button in Status Panel ---
+        mainMenuButton = new JButton("Main Menu");
+        mainMenuButton.addActionListener(e -> {
+            // Manually trigger the close logic
+            currentFrame.dispatchEvent(new WindowEvent(currentFrame, WindowEvent.WINDOW_CLOSING));
+        });
+        statusPanel.add(mainMenuButton);
         
         // Panel for new upgrade buttons
         JPanel upgradePanel = new JPanel();
@@ -222,8 +249,23 @@ public class GameFrame extends JFrame {
             drawpane.requestFocusInWindow();
         });
         upgradePanel.add(buyDoubleShotButton);
+        
+        // 5. Buy Rapid Bullet Button
+        buyRapidBulletButton = new JButton("more rapid bullet (Cost: " + MyConstants.COST_MORE_FREQUENCY_BULLETS + ")");
+        buyRapidBulletButton.addActionListener(e -> {
+            if (score >= MyConstants.COST_MORE_FREQUENCY_BULLETS) {
+                addScore(-MyConstants.COST_MORE_FREQUENCY_BULLETS);
+                currentBulletFrequency -=  MyConstants.UPGRADE_BULLET_FREQUENCY_AMOUNT;
+                addGameLog("Bullet is more rapid!");
 
-        // 5. Buy Shield Button
+            } else {
+                addGameLog("Not enough score for more rapid bullet!");
+            }
+            drawpane.requestFocusInWindow();
+        });
+        upgradePanel.add(buyRapidBulletButton);
+
+        // 6. Buy Shield Button
         buyShieldButton = new JButton("Shield (Cost: " + MyConstants.COST_SHIELD + ")");
         buyShieldButton.addActionListener(e -> {
             if (score >= MyConstants.COST_SHIELD) {
@@ -298,7 +340,7 @@ public class GameFrame extends JFrame {
                     SwingUtilities.invokeLater(() -> {
                         if (gameRunning) fireBullet();
                     });
-                    Thread.sleep(MyConstants.PLAYER_FIRE_DELAY);
+                    Thread.sleep(currentBulletFrequency);
                 }
             } catch (InterruptedException e) {
                 System.out.println("Auto-Shooter thread interrupted.");
@@ -430,17 +472,25 @@ public class GameFrame extends JFrame {
             gameRunning = false;
             addGameLog("GAME OVER. Final Score: " + score);
             
-            // Stop all threads
-            for (Thread t : entityThreads) {
-                t.interrupt();
-            }
+            stopGame(); // Clean up threads
             
+            // Create Game Over UI
             JLabel gameOverLabel = new JLabel("GAME OVER");
             gameOverLabel.setFont(new Font("Arial", Font.BOLD, 80));
             gameOverLabel.setForeground(Color.RED);
-            gameOverLabel.setBounds(0, 0, MyConstants.GAME_PANEL_WIDTH, MyConstants.GAME_PANEL_HEIGHT);
+            gameOverLabel.setBounds(0, MyConstants.GAME_PANEL_HEIGHT / 2 - 100, MyConstants.GAME_PANEL_WIDTH, 100);
             gameOverLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            
+            JButton returnButton = new JButton("Return to Base");
+            returnButton.setFont(new Font("Arial", Font.BOLD, 30));
+            returnButton.setBounds(MyConstants.GAME_PANEL_WIDTH / 2 - 150, MyConstants.GAME_PANEL_HEIGHT / 2 + 20, 300, 60);
+            returnButton.addActionListener(e -> {
+                currentFrame.dispose(); // Close game window
+                mainFrame.setVisible(true); // Show main menu
+            });
+            
             drawpane.add(gameOverLabel, 0); // Add on top
+            drawpane.add(returnButton, 0);
             drawpane.repaint();
         }
     }
@@ -461,6 +511,10 @@ public class GameFrame extends JFrame {
 
     public int getCurrentBulletSpeed() {
         return currentBulletSpeed;
+    }
+    
+    public int getCurrentBulletFrequency() {
+        return currentBulletFrequency;
     }
 
     public int getCurrentPlayerSpeed() {
