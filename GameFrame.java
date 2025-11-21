@@ -85,7 +85,7 @@ public class GameFrame extends JFrame {
         vm = v;
         
         applyDifficultySettings(difficulty);
-        setTitle("Space Fighter - " + playerName + "accepted " + difficulty + "mission.");
+        setTitle("Space Fighter - " + playerName + " accepted " + difficulty + " mission.");
         setSize(MyConstants.FRAME_WIDTH, MyConstants.FRAME_HEIGHT);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Should probably be DISPOSE_ON_CLOSE if main stays open
