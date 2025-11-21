@@ -590,7 +590,6 @@ public class GameFrame extends JFrame {
     public synchronized void triggerVictory() 
     {
         setGameRunning(false);
-        themeSound.stop();
         stopGame();
         
         // Visual Victory Screen
