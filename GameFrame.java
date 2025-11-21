@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -22,16 +21,17 @@ public class GameFrame extends JFrame {
     private JPanel contentpane;
     private JLabel drawpane; // This is the "game screen"
     private MyImageIcon backgroundImg;
-    private GameFrame currentFrame; // Renamed from MainApplication
+    private GameFrame currentFrame;
     private JFrame mainFrame;       // Reference to the Main Menu
     private PlayerRocket playerRocket;
-    //private MySoundEffect themeSound;
     private Random rand = new Random();
     private MySoundEffect themeSound; 
     private VolumeManagement vm; 
+
     // --- Game State ---
     private int score = 0;
     private int targetsDestroyed = 0;
+    private int targetToWin;
     private int playerHP = 3;
     private boolean gameRunning = true;
     private String playerName; // Store player name from menu
@@ -86,7 +86,7 @@ public class GameFrame extends JFrame {
         vm = v;
         
         applyDifficultySettings(difficulty);
-        setTitle("Space Fighter - " + playerName);
+        setTitle("Space Fighter - " + playerName + " " + difficulty);
         setSize(MyConstants.FRAME_WIDTH, MyConstants.FRAME_HEIGHT);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Should probably be DISPOSE_ON_CLOSE if main stays open
@@ -138,31 +138,37 @@ public class GameFrame extends JFrame {
             case "Recruit":
                 playerHP = 5;
                 minSpawnDelay = 1000;  // Ends at moderate speed
+                targetToWin = 20; 
                 difficultyRampFactor = 10; // Gets faster by 20ms every second
                 break;
             case "Soldier":
                 playerHP = 3;
                 minSpawnDelay = 800;
+                targetToWin = 60;
                 difficultyRampFactor = 20; 
                 break;
             case "Veteran":
                 playerHP = 3;
                 minSpawnDelay = 600;   // Ends fast
+                targetToWin = 60;
                 difficultyRampFactor = 30; 
                 break;
             case "Ace":
                 playerHP = 2;
                 minSpawnDelay = 400;   // Ends very fast
+                targetToWin = 80;
                 difficultyRampFactor = 40; 
                 break;
             case "Impossible":
                 playerHP = 1;
                 minSpawnDelay = 200;   // Ends at "Chaos"
+                targetToWin = 100;
                 difficultyRampFactor = 50; 
                 break;
             default: // Default safe values
                 minSpawnDelay = 800;
                 difficultyRampFactor = 30;
+                targetToWin = 30;
         }
         
         baseSpawnDelay = MyConstants.ASTEROID_SPAWN_DELAY;
@@ -170,7 +176,7 @@ public class GameFrame extends JFrame {
      }
     // Helper to cleanly stop the game
     private void stopGame() {
-        //gameRunning = false;
+        playerRocket.setIsRunning(false);
         setGameRunning(false);
         for (Thread t : entityThreads) {
             if (t != null && t.isAlive()) t.interrupt();
@@ -223,7 +229,6 @@ public class GameFrame extends JFrame {
                 }else if (keyCode == KeyEvent.VK_ESCAPE) 
                 {
                     openSettingsMenu();
-                    //currentFrame.dispatchEvent(new WindowEvent(currentFrame, WindowEvent.WINDOW_CLOSING));
                 }
             }
         });
@@ -252,7 +257,7 @@ public class GameFrame extends JFrame {
         statusPanel.add(scoreText);
         
         // --- NEW: Main Menu Button in Status Panel ---
-        mainMenuButton = new JButton("Main Menu");
+        mainMenuButton = new JButton("Resign");
         mainMenuButton.addActionListener(e -> {
             // Manually trigger the close logic
             currentFrame.dispatchEvent(new WindowEvent(currentFrame, WindowEvent.WINDOW_CLOSING));
@@ -571,11 +576,42 @@ public class GameFrame extends JFrame {
                 long reduction = (long)(targetsDestroyed * difficultyRampFactor);
                 currentSpawnDelay = Math.max(minSpawnDelay, baseSpawnDelay - reduction);
                 addGameLog("Asteroid destroyed! +10");
-                String showspawnrate = String.format("%d", currentSpawnDelay);
+                String showspawnrate = String.format("spawn[object/mms]: %d", currentSpawnDelay);
                 addGameLog(showspawnrate);
+                if (targetsDestroyed >= targetToWin) 
+                {
+                        triggerVictory();
+                } else {
+                        addGameLog("Hit! " + targetsDestroyed + "/" + targetToWin);
+                    }
                 return; // Bullet is destroyed, stop checking other asteroids
             }
         }
+    }
+    public synchronized void triggerVictory() 
+    {
+        setGameRunning(false);
+        themeSound.stop();
+        stopGame();
+        
+        // Visual Victory Screen
+        JLabel winLabel = new JLabel("MISSION ACCOMPLISHED");
+        winLabel.setFont(new Font("Arial", Font.BOLD, 50)); // Slightly smaller to fit
+        winLabel.setForeground(Color.GREEN);
+        winLabel.setBounds(0, MyConstants.GAME_PANEL_HEIGHT / 2 - 100, MyConstants.GAME_PANEL_WIDTH, 100);
+        winLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        JButton returnButton = new JButton("Return to Base");
+        returnButton.setFont(new Font("Arial", Font.BOLD, 30));
+        returnButton.setBounds(MyConstants.GAME_PANEL_WIDTH / 2 - 150, MyConstants.GAME_PANEL_HEIGHT / 2 + 20, 300, 60);
+        returnButton.addActionListener(e -> {
+            currentFrame.dispose();
+            mainFrame.setVisible(true);
+        });
+        
+        drawpane.add(winLabel, 0);
+        drawpane.add(returnButton, 0);
+        drawpane.repaint();
     }
     public synchronized void addScore(int points) {
         score += points;

@@ -21,6 +21,7 @@ import javax.swing.*;
 class PlayerRocket extends JLabel {
     private GameFrame parentFrame; // Changed from MainApplication
     private MyImageIcon rocketImg;
+    private boolean isRunning = true;
     private int curX, curY;
 
     public PlayerRocket(GameFrame pf) { // Changed from MainApplication
@@ -35,19 +36,29 @@ class PlayerRocket extends JLabel {
     }
 
     public void moveLeft() {
+        if (isRunning)
+        {
         curX -= parentFrame.getCurrentPlayerSpeed();
         if (curX < 0) {
             curX = 0;
         }
         setLocation(curX, curY);
+        }
     }
 
     public void moveRight() {
+        if (isRunning)
+        {
         curX += parentFrame.getCurrentPlayerSpeed();
         if (curX > MyConstants.GAME_PANEL_WIDTH - MyConstants.ROCKET_WIDTH) {
             curX = MyConstants.GAME_PANEL_WIDTH - MyConstants.ROCKET_WIDTH;
         }
         setLocation(curX, curY);
+        }
+    }
+    public void setIsRunning(boolean b)
+    {
+        isRunning = b;
     }
 }
 
@@ -60,7 +71,8 @@ class Asteroid extends JLabel implements Runnable {
     private int curX, curY;
     private int speed; // Instance speed
     private int width, height; // Instance size
-    private volatile boolean isRunning = true;
+    //private volatile boolean isRunning = true;
+    private boolean isRunning = true;
 
     public Asteroid(GameFrame pf, int startX, int type) 
     {
@@ -152,7 +164,8 @@ class Bullet extends JLabel implements Runnable {
     private GameFrame parentFrame; // Changed from MainApplication
     private MyImageIcon bulletImg;
     private int curX, curY;
-    private volatile boolean isRunning = true;
+    //private volatile boolean isRunning = true;
+    private boolean isRunning = true;
 
     public Bullet(GameFrame pf, int startX, int startY) { // Changed from MainApplication
         parentFrame = pf;
