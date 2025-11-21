@@ -31,7 +31,7 @@ public class GameMain extends JFrame {
 //    }
 
     public GameMain(JFrame mainFrame) {
-        setTitle("Space Fighter - Main Menu");
+        setTitle("Space Fighter - Set Game Play");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 600);
         setLocationRelativeTo(null);

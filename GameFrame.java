@@ -33,7 +33,7 @@ public class GameFrame extends JFrame {
     // --- Game State ---
     private int score = 0;
     private int playerHP = 3;
-    private volatile boolean gameRunning = true;
+    private boolean gameRunning = true;
     private String playerName; // Store player name from menu
     private String difficulty;
 
@@ -67,7 +67,6 @@ public class GameFrame extends JFrame {
     private JTextField hpText;
     private JLabel playerLabel; // To show player's name
 
-    // NO main() method here anymore.
 
     // Constructor now accepts settings from the menu
     public GameFrame(JFrame mainFrame, String playerName, String difficulty) {
@@ -122,7 +121,8 @@ public class GameFrame extends JFrame {
     
     // Helper to cleanly stop the game
     private void stopGame() {
-        gameRunning = false;
+        //gameRunning = false;
+        setGameRunning(false);
         for (Thread t : entityThreads) {
             if (t != null && t.isAlive()) t.interrupt();
         }
@@ -320,9 +320,9 @@ public class GameFrame extends JFrame {
     public void startAsteroidSpawner() {
         Thread spawnerThread = new Thread(() -> {
             try {
-                while (gameRunning) {
+                while (getGameRunning()) {
                     SwingUtilities.invokeLater(() -> {
-                        if (gameRunning) spawnAsteroid();
+                        if (getGameRunning()) spawnAsteroid();
                     });
                     Thread.sleep(MyConstants.ASTEROID_SPAWN_DELAY);
                 }
@@ -336,9 +336,9 @@ public class GameFrame extends JFrame {
     public void startAutoShooter() {
         Thread shooterThread = new Thread(() -> {
             try {
-                while (gameRunning) {
+                while (getGameRunning()) {
                     SwingUtilities.invokeLater(() -> {
-                        if (gameRunning) fireBullet();
+                        if (getGameRunning()) fireBullet();
                     });
                     Thread.sleep(currentBulletFrequency);
                 }
@@ -352,7 +352,7 @@ public class GameFrame extends JFrame {
     // --- Game Logic Methods ---
 
     public synchronized void spawnAsteroid() {
-        if (!gameRunning) return;
+        if (!getGameRunning()) return;
         
         Asteroid asteroid = new Asteroid(currentFrame, rand.nextInt(MyConstants.GAME_PANEL_WIDTH - MyConstants.ASTEROID_WIDTH));
         drawpane.add(asteroid);
@@ -365,7 +365,7 @@ public class GameFrame extends JFrame {
     }
 
     public void fireBullet() {
-        if (!gameRunning) return;
+        if (!getGameRunning()) return;
 
        // MySoundEffect fireSound = new MySoundEffect(MyConstants.FILE_LASER_SOUND);
         laserSound.playOnce();
@@ -451,7 +451,7 @@ public class GameFrame extends JFrame {
     }
 
     public synchronized void loseHealth(int amount) {
-        if (!gameRunning) return;
+        if (!getGameRunning()) return;
         
          MySoundEffect hitSound = new MySoundEffect();
          hitSound.setSound(MyConstants.FILE_PLAYER_HIT_SOUND);
@@ -469,7 +469,8 @@ public class GameFrame extends JFrame {
         
         if (playerHP <= 0) {
             // Game Over
-            gameRunning = false;
+            //gameRunning = false;
+            setGameRunning(false);
             addGameLog("GAME OVER. Final Score: " + score);
             
             stopGame(); // Clean up threads
@@ -542,15 +543,24 @@ public class GameFrame extends JFrame {
      * This is called when an entity dies "on its own" (hits ground, player, etc.)
      * IT MUST NOT be called from inside an iterator loop.
      */
-    public synchronized void removeEntity(JLabel entity) {
-        // 1. Remove the visuals
-        removeEntityGUI(entity); 
-        
-        // 2. Remove from the data list
-        if (entity instanceof Asteroid) {
-            asteroids.remove((Asteroid) entity);
-        } else if (entity instanceof Bullet) {
-            bullets.remove((Bullet) entity);
+        public synchronized void removeEntity(JLabel entity) {
+            // 1. Remove the visuals
+            removeEntityGUI(entity); 
+
+            // 2. Remove from the data list
+            if (entity instanceof Asteroid) {
+                asteroids.remove((Asteroid) entity);
+            } else if (entity instanceof Bullet) {
+                bullets.remove((Bullet) entity);
+            }
         }
-    }
+        public synchronized void setGameRunning(boolean running) 
+        {
+            this.gameRunning = running;
+        }
+
+        public synchronized boolean getGameRunning() 
+        {
+            return this.gameRunning;
+        }
 }
