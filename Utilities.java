@@ -87,16 +87,30 @@ interface MyConstants
     static final int ASTEROID_HEIGHT = 60;
     static final int BULLET_WIDTH = 10;
     static final int BULLET_HEIGHT = 25;
+    
+    static final int ASTEROID_TYPE_SMALL = 0;
+    static final int ASTEROID_TYPE_MEDIUM = 1;
+    static final int ASTEROID_TYPE_LARGE = 2;
+    static final int SIZE_SMALL = 40;
+    static final int SIZE_MEDIUM = 60;
+    static final int SIZE_LARGE = 100;
+    static final int SPEED_SMALL = 7;  // Fast!
+    static final int SPEED_MEDIUM = 4; // Normal
+    static final int SPEED_LARGE = 2;  // Slow
+
 
     // --- Game Speed ---
     static final int PLAYER_SPEED = 20; // Pixels per key press
     static final int ASTEROID_SPEED = 5; // Pixels per game tick
     static final int BULLET_SPEED = 15; // Pixels per game tick
-    static final int ASTEROID_SPAWN_DELAY = 3000; // Milliseconds (3 seconds)
-    static final int PLAYER_FIRE_DELAY = 500; // n millisec / 500 Millis (2 shots per second)
-    static final int UPGRADE_SPEED_AMOUNT = 5; // Speed increase per upgrade
+    static final int ASTEROID_SPAWN_DELAY = 2000; // Milliseconds (3 seconds)
+    static final int PLAYER_FIRE_DELAY = 500; // n millisec / 500 Millis (2 shots per second) 500 default
+    static final int UPGRADE_SPEED_AMOUNT = 10; // Speed increase per upgrade
     static final int UPGRADE_BULLET_FREQUENCY_AMOUNT = 10; // Speed decrease per upgrade
 
+    static final int MAX_PLAYER_SPEED = 40; // Cap speed (Base is 20)
+    static final int MAX_BULLET_SPEED = 50; // Cap speed (Base is 10)
+    static final int MAX_BULLET_FQ = 50;
     // --- Upgrade Costs ---
     static final int COST_HP = 50;
     static final int COST_FASTER_SHIP = 30;

@@ -16,8 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-// This is NOW Frame 2, the Game.
-// It is opened by MainApplication.java.
 public class GameFrame extends JFrame {
 
     // --- Core Components ---
@@ -29,17 +27,23 @@ public class GameFrame extends JFrame {
     private PlayerRocket playerRocket;
     //private MySoundEffect themeSound;
     private Random rand = new Random();
-
+    private MySoundEffect themeSound; 
+    private VolumeManagement vm; 
     // --- Game State ---
     private int score = 0;
+    private int targetsDestroyed = 0;
     private int playerHP = 3;
     private boolean gameRunning = true;
     private String playerName; // Store player name from menu
     private String difficulty;
     
-    private MySoundEffect themeSound; 
-    private VolumeManagement vm; 
 
+        // --- Dynamic Difficulty Stats ---
+    private long baseSpawnDelay;         // Starting slowness
+    private long minSpawnDelay;          // Max speed limit (Terminal Velocity)
+    private double difficultyRampFactor; // How fast it gets harder (ms removed per second)
+    private long currentSpawnDelay;      // The actual current delay
+    
     // --- Upgradeable Stats ---
     private int currentBulletSpeed = MyConstants.BULLET_SPEED;
     private int currentBulletFrequency = MyConstants.PLAYER_FIRE_DELAY;
@@ -81,7 +85,7 @@ public class GameFrame extends JFrame {
         themeSound = backgroundMusic;
         vm = v;
         
-        
+        applyDifficultySettings(difficulty);
         setTitle("Space Fighter - " + playerName);
         setSize(MyConstants.FRAME_WIDTH, MyConstants.FRAME_HEIGHT);
         setLocationRelativeTo(null);
@@ -117,6 +121,7 @@ public class GameFrame extends JFrame {
         explosionSound = new MySoundEffect();
         playerHitSound = new MySoundEffect();
         
+        // Pre-load SFX
         laserSound.setSound(MyConstants.FILE_LASER_SOUND);
         explosionSound.setSound(MyConstants.FILE_EXPLOSION_SOUND);
         playerHitSound.setSound(MyConstants.FILE_PLAYER_HIT_SOUND);
@@ -126,6 +131,43 @@ public class GameFrame extends JFrame {
         startAutoShooter();
     }
     
+     private void applyDifficultySettings(String diff) 
+     {
+        // Adjust spawn rate based on difficulty
+        switch (diff) {
+            case "Recruit":
+                playerHP = 5;
+                minSpawnDelay = 1000;  // Ends at moderate speed
+                difficultyRampFactor = 10; // Gets faster by 20ms every second
+                break;
+            case "Soldier":
+                playerHP = 3;
+                minSpawnDelay = 800;
+                difficultyRampFactor = 20; 
+                break;
+            case "Veteran":
+                playerHP = 3;
+                minSpawnDelay = 600;   // Ends fast
+                difficultyRampFactor = 30; 
+                break;
+            case "Ace":
+                playerHP = 2;
+                minSpawnDelay = 400;   // Ends very fast
+                difficultyRampFactor = 40; 
+                break;
+            case "Impossible":
+                playerHP = 1;
+                minSpawnDelay = 200;   // Ends at "Chaos"
+                difficultyRampFactor = 50; 
+                break;
+            default: // Default safe values
+                minSpawnDelay = 800;
+                difficultyRampFactor = 30;
+        }
+        
+        baseSpawnDelay = MyConstants.ASTEROID_SPAWN_DELAY;
+        currentSpawnDelay = MyConstants.ASTEROID_SPAWN_DELAY; //initialized
+     }
     // Helper to cleanly stop the game
     private void stopGame() {
         //gameRunning = false;
@@ -241,9 +283,20 @@ public class GameFrame extends JFrame {
         buyFasterShipButton = new JButton("Faster Ship (Cost: " + MyConstants.COST_FASTER_SHIP + ")");
         buyFasterShipButton.addActionListener(e -> {
             if (score >= MyConstants.COST_FASTER_SHIP) {
-                addScore(-MyConstants.COST_FASTER_SHIP);
-                currentPlayerSpeed += MyConstants.UPGRADE_SPEED_AMOUNT;
-                addGameLog("Ship is faster!");
+                if (currentPlayerSpeed < MyConstants.MAX_PLAYER_SPEED) {
+                    addScore(-MyConstants.COST_FASTER_SHIP); 
+                    currentPlayerSpeed += MyConstants.UPGRADE_SPEED_AMOUNT; 
+                    addGameLog("Ship Speed Up!");
+                    
+                    // Check if we just hit the max
+                    if (currentPlayerSpeed >= MyConstants.MAX_PLAYER_SPEED) {
+                        buyFasterShipButton.setEnabled(false);
+                        buyFasterShipButton.setText("Ship Speed MAXED");
+                    }
+                } else {
+                    buyFasterShipButton.setEnabled(false);
+                    buyFasterShipButton.setText("Ship Speed MAXED");
+                }
             } else {
                 addGameLog("Not enough score for faster ship!");
             }
@@ -251,13 +304,24 @@ public class GameFrame extends JFrame {
         });
         upgradePanel.add(buyFasterShipButton);
 
-        // 3. Buy Faster Bullets Button
+//        // 3. Buy Faster Bullets Button
         buyFasterBulletButton = new JButton("Faster Bullets (Cost: " + MyConstants.COST_FASTER_BULLETS + ")");
         buyFasterBulletButton.addActionListener(e -> {
             if (score >= MyConstants.COST_FASTER_BULLETS) {
-                addScore(-MyConstants.COST_FASTER_BULLETS);
-                currentBulletSpeed += MyConstants.UPGRADE_SPEED_AMOUNT;
-                addGameLog("Bullets are faster!");
+                if (currentBulletSpeed < MyConstants.MAX_BULLET_SPEED) {
+                    addScore(-MyConstants.COST_FASTER_BULLETS); 
+                    currentBulletSpeed += MyConstants.UPGRADE_SPEED_AMOUNT; 
+                    addGameLog("Bullet Speed Up!");
+                    
+                    // Check if we just hit the max
+                    if (currentBulletSpeed >= MyConstants.MAX_BULLET_SPEED) {
+                        buyFasterBulletButton.setEnabled(false);
+                        buyFasterBulletButton.setText("Bullet SP MAXED");
+                    }
+                } else {
+                    buyFasterBulletButton.setEnabled(false);
+                    buyFasterBulletButton.setText("Bullet SP MAXED");
+                }
             } else {
                 addGameLog("Not enough score for faster bullets!");
             }
@@ -273,6 +337,7 @@ public class GameFrame extends JFrame {
                 hasDoubleShot = true;
                 addGameLog("Double Shot active!");
                 ((JButton)e.getSource()).setEnabled(false); // One-time purchase
+                buyDoubleShotButton.setText("Bought Double Shot");
             } else {
                 addGameLog("Not enough score for Double Shot!");
             }
@@ -284,9 +349,20 @@ public class GameFrame extends JFrame {
         buyRapidBulletButton = new JButton("more rapid bullet (Cost: " + MyConstants.COST_MORE_FREQUENCY_BULLETS + ")");
         buyRapidBulletButton.addActionListener(e -> {
             if (score >= MyConstants.COST_MORE_FREQUENCY_BULLETS) {
-                addScore(-MyConstants.COST_MORE_FREQUENCY_BULLETS);
-                currentBulletFrequency -=  MyConstants.UPGRADE_BULLET_FREQUENCY_AMOUNT;
-                addGameLog("Bullet is more rapid!");
+                if (currentBulletFrequency > MyConstants.MAX_BULLET_FQ) {
+                    addScore(-MyConstants.COST_MORE_FREQUENCY_BULLETS); 
+                    currentBulletFrequency -= MyConstants.UPGRADE_BULLET_FREQUENCY_AMOUNT; 
+                    addGameLog("Bullet More Rapid!");
+                    
+                    // Check if we just hit the max
+                    if (currentBulletFrequency <= MyConstants.MAX_BULLET_SPEED) {
+                        buyRapidBulletButton.setEnabled(false);
+                        buyRapidBulletButton.setText("Bullet FQ MAXED");
+                    }
+                } else {
+                    buyRapidBulletButton.setEnabled(false);
+                    buyRapidBulletButton.setText("Bullet FQ MAXED");
+                }
 
             } else {
                 addGameLog("Not enough score for more rapid bullet!");
@@ -354,7 +430,7 @@ public class GameFrame extends JFrame {
                     SwingUtilities.invokeLater(() -> {
                         if (isGameRunning()) spawnAsteroid();
                     });
-                    Thread.sleep(MyConstants.ASTEROID_SPAWN_DELAY);
+                    Thread.sleep(currentSpawnDelay);
                 }
             } catch (InterruptedException e) {
                 System.out.println("Asteroid Spawner thread interrupted.");
@@ -384,7 +460,40 @@ public class GameFrame extends JFrame {
     public synchronized void spawnAsteroid() {
         if (!isGameRunning()) return;
         
-        Asteroid asteroid = new Asteroid(currentFrame, rand.nextInt(MyConstants.GAME_PANEL_WIDTH - MyConstants.ASTEROID_WIDTH));
+        int startX = rand.nextInt(MyConstants.GAME_PANEL_WIDTH - MyConstants.EAST_PANEL_WIDTH);
+        
+        // Decide Type based on Difficulty
+        int type = MyConstants.ASTEROID_TYPE_MEDIUM; // Default
+        int roll = rand.nextInt(100); // 0-99
+        
+        if (difficulty.equals("Recruit")) {
+            // Mostly Large (Slow/Easy), some Medium
+            if (roll < 60) type = MyConstants.ASTEROID_TYPE_LARGE;
+            else type = MyConstants.ASTEROID_TYPE_MEDIUM;
+            
+        } else if (difficulty.equals("Soldier")) {
+            // Balanced
+            if (roll < 50) type = MyConstants.ASTEROID_TYPE_MEDIUM;
+            else if (roll < 80) type = MyConstants.ASTEROID_TYPE_LARGE;
+            else type = MyConstants.ASTEROID_TYPE_SMALL; // 20% Small
+            
+        } else if (difficulty.equals("Veteran")) {
+            // Harder: More Small/Medium
+            if (roll < 40) type = MyConstants.ASTEROID_TYPE_MEDIUM;
+            else if (roll < 80) type = MyConstants.ASTEROID_TYPE_SMALL;
+            else type = MyConstants.ASTEROID_TYPE_LARGE;
+            
+        } else if (difficulty.equals("Ace")) {
+            // Very Hard: Mostly Small/Medium
+            if (roll < 60) type = MyConstants.ASTEROID_TYPE_SMALL;
+            else type = MyConstants.ASTEROID_TYPE_MEDIUM;
+            
+        } else if (difficulty.equals("Impossible")) {
+            // Chaos: Almost all Small (Fast)
+            if (roll < 80) type = MyConstants.ASTEROID_TYPE_SMALL;
+            else type = MyConstants.ASTEROID_TYPE_MEDIUM;
+        }
+        Asteroid asteroid = new Asteroid(currentFrame, startX, type);
         drawpane.add(asteroid);
         
         Thread asteroidThread = new Thread(asteroid);
@@ -458,8 +567,12 @@ public class GameFrame extends JFrame {
                 asteroids.remove(i);
                 
                 addScore(10);
+                targetsDestroyed++;
+                long reduction = (long)(targetsDestroyed * difficultyRampFactor);
+                currentSpawnDelay = Math.max(minSpawnDelay, baseSpawnDelay - reduction);
                 addGameLog("Asteroid destroyed! +10");
-                
+                String showspawnrate = String.format("%d", currentSpawnDelay);
+                addGameLog(showspawnrate);
                 return; // Bullet is destroyed, stop checking other asteroids
             }
         }

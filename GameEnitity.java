@@ -58,16 +58,38 @@ class Asteroid extends JLabel implements Runnable {
     private GameFrame parentFrame; // Changed from MainApplication
     private MyImageIcon asteroidImg;
     private int curX, curY;
+    private int speed; // Instance speed
+    private int width, height; // Instance size
     private volatile boolean isRunning = true;
 
-    public Asteroid(GameFrame pf, int startX) { // Changed from MainApplication
+    public Asteroid(GameFrame pf, int startX, int type) 
+    {
         parentFrame = pf;
-        asteroidImg = new MyImageIcon(MyConstants.FILE_ASTEROID).resize(MyConstants.ASTEROID_WIDTH, MyConstants.ASTEROID_HEIGHT);
+        switch (type) 
+        {
+            case MyConstants.ASTEROID_TYPE_SMALL:
+                this.width = MyConstants.SIZE_SMALL;
+                this.height = MyConstants.SIZE_SMALL;
+                this.speed = MyConstants.SPEED_SMALL;
+                break;
+            case MyConstants.ASTEROID_TYPE_LARGE:
+                this.width = MyConstants.SIZE_LARGE;
+                this.height = MyConstants.SIZE_LARGE;
+                this.speed = MyConstants.SPEED_LARGE;
+                break;
+            case MyConstants.ASTEROID_TYPE_MEDIUM:
+            default:
+                this.width = MyConstants.SIZE_MEDIUM;
+                this.height = MyConstants.SIZE_MEDIUM;
+                this.speed = MyConstants.SPEED_MEDIUM;
+                break;
+        }
+        asteroidImg = new MyImageIcon(MyConstants.FILE_ASTEROID).resize(this.width, this.height);
         setIcon(asteroidImg);
 
         curX = startX;
-        curY = -MyConstants.ASTEROID_HEIGHT;
-        setBounds(curX, curY, MyConstants.ASTEROID_WIDTH, MyConstants.ASTEROID_HEIGHT);
+        curY = -this.height;
+        setBounds(curX, curY, this.width, this.height);
     }
 
     /**
@@ -76,17 +98,10 @@ class Asteroid extends JLabel implements Runnable {
      * It *only* stops the thread's loop.
      * The GameFrame is responsible for removing the GUI and List item.
      */
-    public void stopThreadOnly() {
+    public void stopThreadOnly() 
+    {
         isRunning = false;
-        // It no longer calls any parentFrame methods.
-        // It just stops its own loop.
     }
-
-    /**
-     * COMMAND B: "Died on its Own"
-     * This is called by the asteroid itself (hits ground/player).
-     * It tells GameFrame to do a "full" removal.
-     */
     public void stopThreadAndRemoveFromList() {
         isRunning = false;
         // This tells GameFrame to remove it from the list AND the GUI
@@ -100,7 +115,8 @@ class Asteroid extends JLabel implements Runnable {
     @Override
     public void run() {
         while (isRunning && parentFrame.isGameRunning()) {
-            curY += MyConstants.ASTEROID_SPEED;
+            //curY += MyConstants.ASTEROID_SPEED;
+            curY += speed;
             setLocation(curX, curY);
 
             if (isRunning && this.getBounds().intersects(parentFrame.getPlayerRocket().getBounds())) {
