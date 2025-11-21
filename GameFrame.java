@@ -259,8 +259,7 @@ public class GameFrame extends JFrame {
         // --- NEW: Main Menu Button in Status Panel ---
         mainMenuButton = new JButton("Resign");
         mainMenuButton.addActionListener(e -> {
-            // Manually trigger the close logic
-            currentFrame.dispatchEvent(new WindowEvent(currentFrame, WindowEvent.WINDOW_CLOSING));
+            triggerGameOver();
         });
         statusPanel.add(mainMenuButton);
         
@@ -613,6 +612,29 @@ public class GameFrame extends JFrame {
         drawpane.add(returnButton, 0);
         drawpane.repaint();
     }
+    
+    public synchronized void triggerGameOver()
+    {
+                    // Create Game Over UI
+            stopGame();
+            JLabel gameOverLabel = new JLabel("MISSION FAILED");
+            gameOverLabel.setFont(new Font("Arial", Font.BOLD, 80));
+            gameOverLabel.setForeground(Color.RED);
+            gameOverLabel.setBounds(0, MyConstants.GAME_PANEL_HEIGHT / 2 - 100, MyConstants.GAME_PANEL_WIDTH, 100);
+            gameOverLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            
+            JButton returnButton = new JButton("Return to Base");
+            returnButton.setFont(new Font("Arial", Font.BOLD, 30));
+            returnButton.setBounds(MyConstants.GAME_PANEL_WIDTH / 2 - 150, MyConstants.GAME_PANEL_HEIGHT / 2 + 20, 300, 60);
+            returnButton.addActionListener(e -> {
+                currentFrame.dispose(); // Close game window
+                mainFrame.setVisible(true); // Show main menu
+            });
+            
+            drawpane.add(gameOverLabel, 0); // Add on top
+            drawpane.add(returnButton, 0);
+            drawpane.repaint();
+    }
     public synchronized void addScore(int points) {
         score += points;
         scoreText.setText(String.valueOf(score));
@@ -642,30 +664,9 @@ public class GameFrame extends JFrame {
         
         if (playerHP <= 0) {
             // Game Over
-            //gameRunning = false;
             setGameRunning(false);
             addGameLog("GAME OVER. Final Score: " + score);
-            
-            stopGame(); // Clean up threads
-            
-            // Create Game Over UI
-            JLabel gameOverLabel = new JLabel("GAME OVER");
-            gameOverLabel.setFont(new Font("Arial", Font.BOLD, 80));
-            gameOverLabel.setForeground(Color.RED);
-            gameOverLabel.setBounds(0, MyConstants.GAME_PANEL_HEIGHT / 2 - 100, MyConstants.GAME_PANEL_WIDTH, 100);
-            gameOverLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            
-            JButton returnButton = new JButton("Return to Base");
-            returnButton.setFont(new Font("Arial", Font.BOLD, 30));
-            returnButton.setBounds(MyConstants.GAME_PANEL_WIDTH / 2 - 150, MyConstants.GAME_PANEL_HEIGHT / 2 + 20, 300, 60);
-            returnButton.addActionListener(e -> {
-                currentFrame.dispose(); // Close game window
-                mainFrame.setVisible(true); // Show main menu
-            });
-            
-            drawpane.add(gameOverLabel, 0); // Add on top
-            drawpane.add(returnButton, 0);
-            drawpane.repaint();
+            triggerGameOver();
         }
     }
 
