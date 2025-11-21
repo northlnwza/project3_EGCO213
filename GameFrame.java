@@ -36,6 +36,9 @@ public class GameFrame extends JFrame {
     private boolean gameRunning = true;
     private String playerName; // Store player name from menu
     private String difficulty;
+    
+    private MySoundEffect themeSound; 
+    private VolumeManagement vm; 
 
     // --- Upgradeable Stats ---
     private int currentBulletSpeed = MyConstants.BULLET_SPEED;
@@ -69,12 +72,16 @@ public class GameFrame extends JFrame {
 
 
     // Constructor now accepts settings from the menu
-    public GameFrame(JFrame mainFrame, String playerName, String difficulty) {
+    public GameFrame(JFrame mainFrame, String playerName, String difficulty,MySoundEffect backgroundMusic, VolumeManagement v) 
+    {
         this.mainFrame = mainFrame; // Store reference to main menu
         this.playerName = playerName;
         this.difficulty = difficulty;
         this.currentFrame = this;
-
+        themeSound = backgroundMusic;
+        vm = v;
+        
+        
         setTitle("Space Fighter - " + playerName);
         setSize(MyConstants.FRAME_WIDTH, MyConstants.FRAME_HEIGHT);
         setLocationRelativeTo(null);
@@ -127,6 +134,27 @@ public class GameFrame extends JFrame {
             if (t != null && t.isAlive()) t.interrupt();
         }
     }
+    public void openSettingsMenu() {
+        // 1. Pause the game logic
+        
+        // 2. Hide the game window (SettingApplication does this to owner, but let's be explicit)
+        this.setVisible(false);
+        
+        // 3. Create the Settings Frame
+        // We pass 'this' (GameFrame) as the owner, so when Settings closes, GameFrame re-appears.
+        SettingApplication settings = new SettingApplication(this, themeSound, vm);
+        
+        // 4. Add a listener to resume game when settings close
+        settings.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                // Resume the game!
+                // Ensure focus returns to drawpane for keyboard controls
+                drawpane.requestFocusInWindow(); 
+            }
+        });
+    }
+
 
     public void AddComponents() {
 
@@ -150,8 +178,10 @@ public class GameFrame extends JFrame {
                     playerRocket.moveLeft();
                 } else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) {
                     playerRocket.moveRight();
-                }else if (keyCode == KeyEvent.VK_ESCAPE) {
-                    currentFrame.dispatchEvent(new WindowEvent(currentFrame, WindowEvent.WINDOW_CLOSING));
+                }else if (keyCode == KeyEvent.VK_ESCAPE) 
+                {
+                    openSettingsMenu();
+                    //currentFrame.dispatchEvent(new WindowEvent(currentFrame, WindowEvent.WINDOW_CLOSING));
                 }
             }
         });
@@ -320,9 +350,9 @@ public class GameFrame extends JFrame {
     public void startAsteroidSpawner() {
         Thread spawnerThread = new Thread(() -> {
             try {
-                while (getGameRunning()) {
+                while (isGameRunning()) {
                     SwingUtilities.invokeLater(() -> {
-                        if (getGameRunning()) spawnAsteroid();
+                        if (isGameRunning()) spawnAsteroid();
                     });
                     Thread.sleep(MyConstants.ASTEROID_SPAWN_DELAY);
                 }
@@ -336,9 +366,9 @@ public class GameFrame extends JFrame {
     public void startAutoShooter() {
         Thread shooterThread = new Thread(() -> {
             try {
-                while (getGameRunning()) {
+                while (isGameRunning()) {
                     SwingUtilities.invokeLater(() -> {
-                        if (getGameRunning()) fireBullet();
+                        if (isGameRunning()) fireBullet();
                     });
                     Thread.sleep(currentBulletFrequency);
                 }
@@ -352,7 +382,7 @@ public class GameFrame extends JFrame {
     // --- Game Logic Methods ---
 
     public synchronized void spawnAsteroid() {
-        if (!getGameRunning()) return;
+        if (!isGameRunning()) return;
         
         Asteroid asteroid = new Asteroid(currentFrame, rand.nextInt(MyConstants.GAME_PANEL_WIDTH - MyConstants.ASTEROID_WIDTH));
         drawpane.add(asteroid);
@@ -365,7 +395,7 @@ public class GameFrame extends JFrame {
     }
 
     public void fireBullet() {
-        if (!getGameRunning()) return;
+        if (!isGameRunning()) return;
 
        // MySoundEffect fireSound = new MySoundEffect(MyConstants.FILE_LASER_SOUND);
         laserSound.playOnce();
@@ -445,7 +475,7 @@ public class GameFrame extends JFrame {
     }
 
     public synchronized void loseHealth(int amount) {
-        if (!getGameRunning()) return;
+        if (!isGameRunning()) return;
         
          MySoundEffect hitSound = new MySoundEffect();
          hitSound.setSound(MyConstants.FILE_PLAYER_HIT_SOUND);
@@ -500,9 +530,7 @@ public class GameFrame extends JFrame {
         return playerRocket;
     }
     
-    public synchronized boolean isGameRunning() {
-        return gameRunning;
-    }
+
 
     public int getCurrentBulletSpeed() {
         return currentBulletSpeed;
@@ -552,9 +580,8 @@ public class GameFrame extends JFrame {
         {
             this.gameRunning = running;
         }
-
-        public synchronized boolean getGameRunning() 
+        public synchronized boolean isGameRunning() 
         {
-            return this.gameRunning;
+        return gameRunning;
         }
 }

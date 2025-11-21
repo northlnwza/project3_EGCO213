@@ -30,7 +30,7 @@ public class GameMain extends JFrame {
 //        new GameMain();
 //    }
 
-    public GameMain(JFrame mainFrame) {
+    public GameMain(JFrame mainFrame,MySoundEffect backgroundMusic, VolumeManagement vm) {
         setTitle("Space Fighter - Set Game Play");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 600);
@@ -106,7 +106,7 @@ public class GameMain extends JFrame {
             String selectedDifficulty = getSelectedDifficulty();
             
             // Create and show the game frame
-            GameFrame gameFrame = new GameFrame(mainFrame, playerName, selectedDifficulty);
+            GameFrame gameFrame = new GameFrame(mainFrame, playerName, selectedDifficulty, backgroundMusic, vm);
             gameFrame.setVisible(true);
             mainFrame.setVisible(false);
             // Close this menu frame

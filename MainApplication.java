@@ -115,7 +115,7 @@ class MainApplication extends JFrame
             public void actionPerformed(ActionEvent e) {
                 clickedSound.playOnce();
                 currentFrame.setVisible(false);
-                new GameMain(currentFrame);
+                new GameMain(currentFrame, backgroundMusic, vmBackground);
             }
         });
         
