@@ -85,7 +85,7 @@ public class GameFrame extends JFrame {
         vm = v;
         
         applyDifficultySettings(difficulty);
-        setTitle("Space Fighter - " + playerName + " " + difficulty);
+        setTitle("Space Fighter - " + playerName + "accepted " + difficulty + "mission.");
         setSize(MyConstants.FRAME_WIDTH, MyConstants.FRAME_HEIGHT);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Should probably be DISPOSE_ON_CLOSE if main stays open
@@ -574,7 +574,7 @@ public class GameFrame extends JFrame {
                 long reduction = (long)(targetsDestroyed * difficultyRampFactor);
                 currentSpawnDelay = Math.max(minSpawnDelay, baseSpawnDelay - reduction);
                 addGameLog("Asteroid destroyed! +10");
-                String showspawnrate = String.format("spawn[object/mms]: %d", currentSpawnDelay);
+                String showspawnrate = String.format("spawn[object/ms]: %d", currentSpawnDelay);
                 addGameLog(showspawnrate);
                 if (targetsDestroyed >= targetToWin) 
                 {
