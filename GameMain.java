@@ -1,10 +1,8 @@
 /*
- * Group Members:
- * 1. [Your Name] ([Your ID])
- * 2. [Name] ([ID])
- * 3. [Name] ([ID])
- * 4. [Name] ([ID])
- * 5. [Name] ([ID])
+Thanakrit Jomhong 6713118
+Phurinut Wongwatcharapaiboon 6713245
+Jitchaya Hirunsri 6713222
+Tanop Udomkanaruck 6713233
  */
 package Project3_6713118; // Make sure to rename XXX to your ID
 import javax.swing.*;
