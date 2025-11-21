@@ -407,39 +407,33 @@ public class GameFrame extends JFrame {
 
     public synchronized void checkBulletCollisions(Bullet bullet) {
         if (!bullet.isRunning()) return;
-
-        // Use iterator to safely remove asteroids
-        Iterator<Asteroid> iter = asteroids.iterator();
-        while (iter.hasNext()) {
-            Asteroid asteroid = iter.next();
+        
+        // Loop BACKWARDS through the list by Index
+        for (int i = asteroids.size() - 1; i >= 0; i--) {
+            Asteroid asteroid = asteroids.get(i);
+            
             if (asteroid.isRunning() && bullet.getBounds().intersects(asteroid.getBounds())) {
                 // Collision!
-//                MySoundEffect hitSound = new MySoundEffect(MyConstants.FILE_EXPLOSION_SOUND);
-//                hitSound.playOnce();
                 explosionSound.playOnce();
                 
-                bullet.stopThread();    // Stop and remove bullet
+                bullet.stopThread();    // Stop bullet thread
                 
-                // --- THE CORRECT FIX IS HERE ---
-                // 1. Tell the asteroid thread to STOP, but do nothing else.
-                asteroid.stopThreadOnly(); 
+                // 1. Stop the Asteroid Thread
+                asteroid.stopThreadOnly();
                 
-                // 2. YOU (GameFrame) remove its visuals from the screen.
-                removeEntityGUI(asteroid); // Call our new, specialized method
+                // 2. Remove Visuals
+                removeEntityGUI(asteroid);
                 
-                // 3. The iterator (the "Scout") removes it from the *list*.
-                iter.remove(); 
-                // --- END FIX ---
-
-                addScore(10);           // Add score
+                // 3. Remove from List using Index (Safe because we are looping backwards)
+                asteroids.remove(i);
+                
+                addScore(10);
                 addGameLog("Asteroid destroyed! +10");
                 
-                // iter.remove(); // <-- OLD POSITION, REMOVED
-                return; // Bullet is destroyed, stop checking
+                return; // Bullet is destroyed, stop checking other asteroids
             }
         }
     }
-
     public synchronized void addScore(int points) {
         score += points;
         scoreText.setText(String.valueOf(score));
@@ -506,7 +500,7 @@ public class GameFrame extends JFrame {
         return playerRocket;
     }
     
-    public boolean isGameRunning() {
+    public synchronized boolean isGameRunning() {
         return gameRunning;
     }
 
