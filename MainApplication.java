@@ -22,7 +22,6 @@ class MainApplication extends JFrame
     private MainApplication    currentFrame;
     private MySoundEffect      backgroundMusic;
     private VolumeManagement   vmBackground;
-//    private VolumeManagement   vmClicked;
 
     private int framewidth  = MyConstants.FRAME_WIDTH;
     private int frameheight = MyConstants.FRAME_HEIGHT;

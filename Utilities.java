@@ -42,6 +42,12 @@ interface MyConstants
     static final String FILE_Volume         = PATH + "volume.png";
     static final String FILE_Selected       = PATH + "selected.png";
     static final String FILE_Unselected     = PATH + "unselected.png";
+    static final String FILE_Start          = PATH + "startgame.png";
+    static final String FILE_Start_Glow     = PATH + "startgame-glow.png";
+    static final String FILE_BackMenu       = PATH + "backmenu.png";
+    static final String FILE_BackMenu_Glow  = PATH + "backmenu-glow.png";
+    
+
     
     // gameplay background
     static final String FILE_BACKGROUND     = PATH + "background.jpg";
@@ -182,13 +188,17 @@ class MySoundEffect {
 
 class VolumeManagement {
     private float gain;
+    private boolean mute;
     
     public VolumeManagement() {
         this.gain = MyConstants.DEFAULT_VL;
+        mute = false;
     }
     public void updateGain(float newGain) {
         gain = newGain;
     }
+    public void setMute(boolean m) { mute = m; }
+    public boolean getMuteValue() { return mute; }
     public float getGain() { return gain; }
     public float getVolumeSliderBar() { return gain * 100; }
 }

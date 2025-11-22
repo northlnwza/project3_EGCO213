@@ -176,49 +176,36 @@ public class SettingApplication extends JFrame{
         mutePanel.add(mute);
         mutePanel.add(unmute);
         
-        unmute.setSelected(true);
+        if(vmBackground.getMuteValue()) {
+            mute.setSelected(true);
+            mute.setIcon(new MyImageIcon(MyConstants.FILE_Selected));
+            unmute.setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
+        } else {
+            unmute.setSelected(true);
+            unmute.setIcon(new MyImageIcon(MyConstants.FILE_Selected));
+            mute.setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
+        }
+        
         mute.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (mute.isSelected()) {
-                    ownerBackgroundMusic.stop();
-                    mute.setIcon(new MyImageIcon(MyConstants.FILE_Selected));
-                    unmute.setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
-                }
+                ownerBackgroundMusic.stop();
+                mute.setIcon(new MyImageIcon(MyConstants.FILE_Selected));
+                unmute.setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
+                vmBackground.setMute(true);
             }
         });
         unmute.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (unmute.isSelected()) {
-                    ownerBackgroundMusic.playLoop();
-                    mute.setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
-                    unmute.setIcon(new MyImageIcon(MyConstants.FILE_Selected));
-                }
+                ownerBackgroundMusic.playLoop();
+                mute.setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
+                unmute.setIcon(new MyImageIcon(MyConstants.FILE_Selected));
+                vmBackground.setMute(false);
             }
         });
         
         
-        
-        /*
-        JButton saveBtn = new JButton();
-        saveBtn.setIcon(new MyImageIcon(MyConstants.FILE_Save));
-        saveBtn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                saveBtn.setIcon(new MyImageIcon(MyConstants.FILE_Save_Glow));
-            }
-            public void mouseExited(MouseEvent e) {
-                saveBtn.setIcon(new MyImageIcon(MyConstants.FILE_Save));
-            }
-        });
-        saveBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clickedSound.playOnce();
-            }
-        });
-        */
         
         // ------------- Back Button 
         JPanel backPanel = new JPanel();
@@ -257,13 +244,10 @@ public class SettingApplication extends JFrame{
         
         // --------------- boxSettingMenu.add
         boxSettingMenu.add(Box.createRigidArea(new Dimension(0, 60)));
-        
         boxSettingMenu.add(selectMusicPanel);
         boxSettingMenu.add(Box.createRigidArea(new Dimension(0, 15)));
-        
         boxSettingMenu.add(mutePanel);
         boxSettingMenu.add(Box.createRigidArea(new Dimension(0, 15)));
-        
         boxSettingMenu.add(volumePanel);
      
         

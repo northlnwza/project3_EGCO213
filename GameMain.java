@@ -17,10 +17,16 @@ public class GameMain extends JFrame {
     // (Req #2) Components
     private JTextField playerNameField;
     private JRadioButton[] difficultyRadios;
-    private JButton startGameButton;
-    private JButton backGameButton;
     private JFrame mainFrame;
     private JFrame currentFrame;
+    private JLabel drawpane;
+    private JPanel contentpane;
+    private MySoundEffect backgroundMusic;
+    private VolumeManagement vm;
+    private MySoundEffect clickedSound;
+    
+//    private int i;
+    
 
 //    public static void main(String[] args) {
         // Run the GUI on the Event Dispatch Thread
@@ -28,45 +34,54 @@ public class GameMain extends JFrame {
 //        new GameMain();
 //    }
 
-    public GameMain(JFrame mainFrame,MySoundEffect backgroundMusic, VolumeManagement vm) {
+    public GameMain(JFrame mainFrame, MySoundEffect backgroundMusic, VolumeManagement vm) {
+        
+        contentpane = (JPanel)getContentPane();
+	contentpane.setLayout(new BorderLayout());   
+        
+        this.backgroundMusic = backgroundMusic;
+        this.vm = vm;
+        this.mainFrame = mainFrame;
+        this.clickedSound = new MySoundEffect();
+        clickedSound.setSound(MyConstants.FILE_CLICKED);
+        
         setTitle("Space Fighter - Set Game Play");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 600);
+        setSize(MyConstants.FRAME_WIDTH, MyConstants.FRAME_HEIGHT);
         setLocationRelativeTo(null);
-        setResizable(false);
-        
+        setResizable(true);
+        setLayout(new BorderLayout());        
         currentFrame = this;
+        setVisible(true);
         
+        AddComponent();
+    }
+    
+    
+    private void AddComponent() {
         
-        // Main panel with a nice border
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        add(mainPanel);
-
+        mainPanel.setOpaque(false);
+        
+        drawpane = new JLabel();
+        drawpane.setIcon(new MyImageIcon(MyConstants.FILE_BG)); 
+        drawpane.setLayout(new BorderLayout());
+        
         // --- Title ---
-        JLabel titleLabel = new JLabel("SPACE FIGHTER");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(titleLabel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        // --- (Req #2) Group Names ---
-//        JLabel namesLabel = new JLabel("By: [Your Name] (ID), [Friend's Name] (ID), ...");
-//        namesLabel.setFont(new Font("Arial", Font.ITALIC, 12));
-//        namesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-//        mainPanel.add(namesLabel);
-//        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+        JLabel titleLabel = new JLabel();
+        titleLabel.setIcon(new MyImageIcon(MyConstants.FILE_GameLogo));
+//        titleLabel.add(Box.createRigidArea(new Dimension(0, 100)));
+        
 
         // --- (Req #2) JTextField ---
-        mainPanel.add(createSectionLabel("Enter Your Name:"));
-        playerNameField = new JTextField("Commander");
+//        mainPanel.add(createSectionLabel("Enter Your Name:"));
+        playerNameField = new JTextField("Player Name");
+        playerNameField.setFont(new Font("Arial", Font.PLAIN, 25));
         playerNameField.setMaximumSize(new Dimension(300, 30));
-        mainPanel.add(playerNameField);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        
         
         // --- (Req #2) JRadioButton (5+ items) ---
-        mainPanel.add(createSectionLabel("Select Difficulty:"));
         String[] difficulties = {"Recruit", "Soldier", "Veteran", "Ace", "Impossible"};
         difficultyRadios = new JRadioButton[difficulties.length];
         ButtonGroup difficultyGroup = new ButtonGroup();
@@ -74,32 +89,67 @@ public class GameMain extends JFrame {
         radioPanel.setMaximumSize(new Dimension(300, 100));
         for (int i = 0; i < difficulties.length; i++) {
             difficultyRadios[i] = new JRadioButton(difficulties[i]);
+            difficultyRadios[i].setFont(new Font("Arial", Font.PLAIN, 18));
+            difficultyRadios[i].setForeground(Color.WHITE);
             difficultyGroup.add(difficultyRadios[i]);
             radioPanel.add(difficultyRadios[i]);
         }
+        
+        for(int i = 0; i < difficulties.length; i++) {
+            if(i == 1) {
+                difficultyRadios[i].setIcon(new MyImageIcon(MyConstants.FILE_Selected));
+                difficultyRadios[i].setSelected(true);
+            } else {
+                difficultyRadios[i].setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
+            }
+            difficultyRadios[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    for(int j = 0; j < difficulties.length; j++) {
+                        if(difficultyRadios[j].isSelected()) 
+                            difficultyRadios[j].setIcon(new MyImageIcon(MyConstants.FILE_Selected));
+                        else 
+                            difficultyRadios[j].setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
+                    }
+//                    difficultyRadios[i].setIcon(new MyImageIcon(MyConstants.FILE_Selected));
+//                    for(int j = 0; j < difficulties.length; i++) {
+//                        if (j == i) continue;
+//                        else difficultyRadios[i].setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
+//                    }
+                }
+            });
+        }
         difficultyRadios[1].setSelected(true); // Default to "Soldier"
-        mainPanel.add(radioPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        radioPanel.setOpaque(false);
+//        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+//        mainPanel.add(Box.createVerticalGlue()); // Pushes start button to bottom
 
         
-        mainPanel.add(Box.createVerticalGlue()); // Pushes start button to bottom
-
         // --- (Req #2) JButton that opens another frame ---
-        startGameButton = new JButton("START GAME");
-        startGameButton.setFont(new Font("Arial", Font.BOLD, 24));
-        startGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        startGameButton.setMinimumSize(new Dimension(300, 60));
-        startGameButton.setPreferredSize(new Dimension(300, 60));
+        JButton startGameButton = new JButton();
+        JButton backGameButton = new JButton();
         
-        backGameButton = new JButton("BACK TO MAIN MENU");
-        backGameButton.setFont(new Font("Arial", Font.BOLD, 24));
-        backGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        backGameButton.setMinimumSize(new Dimension(300, 60));
-        backGameButton.setPreferredSize(new Dimension(300, 60));
+        startGameButton.setIcon(new MyImageIcon(MyConstants.FILE_Start));
+        startGameButton.setOpaque(false);
+        backGameButton.setIcon(new MyImageIcon(MyConstants.FILE_BackMenu));
+        backGameButton.setOpaque(false);
+        
+        RemoveBG.removeBgBtn(startGameButton); 
+        RemoveBG.removeBgBtn(backGameButton);
 
-        // (Req #3) Event Handler 2 & 3 (ActionListener & MouseEvent)
+        
+        startGameButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                startGameButton.setIcon(new MyImageIcon(MyConstants.FILE_Start_Glow));
+            }
+            public void mouseExited(MouseEvent e) {
+                startGameButton.setIcon(new MyImageIcon(MyConstants.FILE_Start));
+            }
+        });
         startGameButton.addActionListener(e -> {
             // This is the logic that opens Frame 2
+            clickedSound.playOnce();
             String playerName = playerNameField.getText();
             String selectedDifficulty = getSelectedDifficulty();
             
@@ -110,37 +160,51 @@ public class GameMain extends JFrame {
             // Close this menu frame
             this.dispose();
         });
-        
-        backGameButton.addActionListener(e -> {
-            // This is the logic that opens Frame 2
-            mainFrame.setVisible(true);
-            // Close this menu frame
-            this.dispose();
-        });
-        
-        
 
-        // (Req #3) This satisfies the MouseEvent handler requirement
-        startGameButton.addMouseListener(new MouseAdapter() {
+        
+        backGameButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                // Substantial: change button appearance
-                startGameButton.setBackground(Color.GREEN);
+                backGameButton.setIcon(new MyImageIcon(MyConstants.FILE_BackMenu_Glow));
             }
-            @Override
             public void mouseExited(MouseEvent e) {
-                // Substantial: revert button appearance
-                startGameButton.setBackground(UIManager.getColor("Button.background"));
+                backGameButton.setIcon(new MyImageIcon(MyConstants.FILE_BackMenu));
             }
         });
-        
-        
-        
-        mainPanel.add(startGameButton);
-        mainPanel.add(backGameButton);
+        backGameButton.addActionListener(e -> {
+            clickedSound.playOnce();
+            mainFrame.setVisible(true);
+            this.dispose();
+        });
 
-        // Show the frame
-        setVisible(true);
+        
+        JLabel textDifficult = new JLabel("Select Difficulty");
+        textDifficult.setForeground(Color.WHITE);
+        textDifficult.setFont(new Font("Arial", Font.BOLD, 20));
+        
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 100)));
+        mainPanel.add(titleLabel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+        mainPanel.add(playerNameField);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+        mainPanel.add(textDifficult);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainPanel.add(radioPanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+        mainPanel.add(startGameButton);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainPanel.add(backGameButton);
+        
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        playerNameField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        radioPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textDifficult.setAlignmentX(Component.CENTER_ALIGNMENT);
+        startGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        drawpane.add(mainPanel, BorderLayout.CENTER);
+        contentpane.add(drawpane, BorderLayout.CENTER);
+        validate();       
     }
     
     // Helper to get selected radio button

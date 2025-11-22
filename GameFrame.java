@@ -75,7 +75,7 @@ public class GameFrame extends JFrame {
 
 
     // Constructor now accepts settings from the menu
-    public GameFrame(JFrame mainFrame, String playerName, String difficulty,MySoundEffect backgroundMusic, VolumeManagement v) 
+    public GameFrame(JFrame mainFrame, String playerName, String difficulty, MySoundEffect backgroundMusic, VolumeManagement v) 
     {
         this.mainFrame = mainFrame; // Store reference to main menu
         this.playerName = playerName;
