@@ -46,8 +46,19 @@ interface MyConstants
     static final String FILE_Start_Glow     = PATH + "startgame-glow.png";
     static final String FILE_BackMenu       = PATH + "backmenu.png";
     static final String FILE_BackMenu_Glow  = PATH + "backmenu-glow.png";
-    static final String FILE_PlayIcon  = PATH + "spaceship1 Background Removed.png";
-    
+    static final String FILE_PlayIcon       = PATH + "spaceship1.png";
+    static final String FILE_HP             = PATH + "hp.png";
+    static final String FILE_HP_Glow        = PATH + "hp-glow.png";
+    static final String FILE_FasterBullet   = PATH + "fasterbullet.png";
+    static final String FILE_FasterBullet_Glow  = PATH + "fasterbullet-glow.png";
+    static final String FILE_FasterShip     = PATH + "fastership.png";
+    static final String FILE_FasterShip_Glow= PATH + "fastership-glow.png";
+    static final String FILE_DoubleShot     = PATH + "doubleshot.png";
+    static final String FILE_DoubleShot_Glow= PATH + "doubleshot-glow.png";
+    static final String FILE_RapidFire      = PATH + "rapidfire.png";
+    static final String FILE_RapidFire_Glow = PATH + "rapidfire-glow.png";
+    static final String FILE_Shield         = PATH + "shield.png";
+    static final String FILE_Shield_Glow    = PATH + "shield-glow.png";
 
     
     // gameplay background

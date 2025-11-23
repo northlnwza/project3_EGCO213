@@ -17,14 +17,15 @@ import java.util.Random;
 public class GameFrame extends JFrame {
 
     // --- Core Components ---
-    private JPanel contentpane;
-    private JLabel drawpane; // This is the "game screen"
-    private MyImageIcon backgroundImg;
-    private GameFrame currentFrame;
-    private JFrame mainFrame;       // Reference to the Main Menu
-    private PlayerRocket playerRocket;
-    private Random rand = new Random();
-    private MySoundEffect themeSound; 
+    private JPanel          contentpane;
+    private JLabel          drawpane; // This is the "game screen"
+    private MyImageIcon     backgroundImg;
+    private GameFrame       currentFrame;
+    private JFrame          mainFrame;       // Reference to the Main Menu
+    private PlayerRocket    playerRocket;
+    private Random          rand = new Random();
+    private MySoundEffect   themeSound;
+    private MySoundEffect   clickedSound;
     private VolumeManagement vm; 
 
     // --- Game State ---
@@ -126,8 +127,8 @@ public class GameFrame extends JFrame {
         playerHitSound.setSound(MyConstants.FILE_PLAYER_HIT_SOUND);
 
         // Start game threads
-        startAsteroidSpawner();
         startAutoShooter();
+        startAsteroidSpawner();
     }
     
      private void applyDifficultySettings(String diff) 
@@ -212,6 +213,9 @@ public class GameFrame extends JFrame {
         drawpane.setIcon(backgroundImg);
         drawpane.setLayout(null); // We manually position entities
         
+        clickedSound = new MySoundEffect();
+        clickedSound.setSound(MyConstants.FILE_CLICKED);
+        
         // Add the player rocket to the drawpane
         playerRocket = new PlayerRocket(currentFrame);
         drawpane.add(playerRocket);
@@ -237,20 +241,31 @@ public class GameFrame extends JFrame {
         drawpane.requestFocusInWindow();
 
         // --- SOUTH: Game Status & Upgrades ---
-        JPanel southPanel = new JPanel(new GridLayout(2, 1)); 
+//        JPanel southPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.Y_AXIS));
+        southPanel.setPreferredSize(new Dimension(0, 110));
+//        southPanel.setOpaque(false);
+        southPanel.setBackground(Color.BLACK);
         
         // Panel for HP and Score
         JPanel statusPanel = new JPanel();
+//        statusPanel.setBounds(0, 0, 0, 50);
+        statusPanel.setOpaque(false);
+//        statusPanel.setBackground(Color.BLACK);
         
         playerLabel = new JLabel("Player: " + this.playerName);
+        playerLabel.setForeground(Color.green);
         statusPanel.add(playerLabel);
         
         statusPanel.add(new JLabel("HP:"));
+        statusPanel.setForeground(Color.green);
         hpText = new JTextField(String.valueOf(playerHP), 3);
         hpText.setEditable(false);
         statusPanel.add(hpText);
 
         statusPanel.add(new JLabel("Score:"));
+        statusPanel.setForeground(Color.green);
         scoreText = new JTextField(String.valueOf(score), 6);
         scoreText.setEditable(false);
         statusPanel.add(scoreText);
@@ -262,14 +277,19 @@ public class GameFrame extends JFrame {
         });
         statusPanel.add(mainMenuButton);
         
+        
         // Panel for new upgrade buttons
         JPanel upgradePanel = new JPanel();
-        upgradePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
+//        upgradePanel.setBackground(Color.BLACK);
+        upgradePanel.setOpaque(false);
+        upgradePanel.setLayout(new BoxLayout(upgradePanel, BoxLayout.X_AXIS));
+//        upgradePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+      
         // --- (Req #3) All these buttons have ActionListeners ---
 
         // 1. Buy HP Button
-        buyHpButton = new JButton("HP+1 (Cost: " + MyConstants.COST_HP + ")");
+//        buyHpButton = new JButton("HP+1 (Cost: " + MyConstants.COST_HP + ")");
+        buyHpButton = new JButton();
         buyHpButton.addActionListener(e -> {
             if (score >= MyConstants.COST_HP) {
                 addScore(-MyConstants.COST_HP);
@@ -280,10 +300,10 @@ public class GameFrame extends JFrame {
             }
             drawpane.requestFocusInWindow();
         });
-        upgradePanel.add(buyHpButton);
 
         // 2. Buy Faster Ship Button
-        buyFasterShipButton = new JButton("Faster Ship (Cost: " + MyConstants.COST_FASTER_SHIP + ")");
+//        buyFasterShipButton = new JButton("Faster Ship (Cost: " + MyConstants.COST_FASTER_SHIP + ")");
+        buyFasterShipButton = new JButton();
         buyFasterShipButton.addActionListener(e -> {
             if (score >= MyConstants.COST_FASTER_SHIP) {
                 if (currentPlayerSpeed < MyConstants.MAX_PLAYER_SPEED) {
@@ -305,10 +325,10 @@ public class GameFrame extends JFrame {
             }
             drawpane.requestFocusInWindow();
         });
-        upgradePanel.add(buyFasterShipButton);
 
 //        // 3. Buy Faster Bullets Button
-        buyFasterBulletButton = new JButton("Faster Bullets (Cost: " + MyConstants.COST_FASTER_BULLETS + ")");
+//        buyFasterBulletButton = new JButton("Faster Bullets (Cost: " + MyConstants.COST_FASTER_BULLETS + ")");
+        buyFasterBulletButton = new JButton();
         buyFasterBulletButton.addActionListener(e -> {
             if (score >= MyConstants.COST_FASTER_BULLETS) {
                 if (currentBulletSpeed < MyConstants.MAX_BULLET_SPEED) {
@@ -330,10 +350,10 @@ public class GameFrame extends JFrame {
             }
             drawpane.requestFocusInWindow();
         });
-        upgradePanel.add(buyFasterBulletButton);
 
         // 4. Buy Double Shot Button
-        buyDoubleShotButton = new JButton("Double Shot (Cost: " + MyConstants.COST_DOUBLE_SHOT + ")");
+//        buyDoubleShotButton = new JButton("Double Shot (Cost: " + MyConstants.COST_DOUBLE_SHOT + ")");
+        buyDoubleShotButton = new JButton();
         buyDoubleShotButton.addActionListener(e -> {
             if (score >= MyConstants.COST_DOUBLE_SHOT) {
                 addScore(-MyConstants.COST_DOUBLE_SHOT);
@@ -346,10 +366,10 @@ public class GameFrame extends JFrame {
             }
             drawpane.requestFocusInWindow();
         });
-        upgradePanel.add(buyDoubleShotButton);
         
         // 5. Buy Rapid Bullet Button
-        buyRapidBulletButton = new JButton("more rapid bullet (Cost: " + MyConstants.COST_MORE_FREQUENCY_BULLETS + ")");
+//        buyRapidBulletButton = new JButton("more rapid bullet (Cost: " + MyConstants.COST_MORE_FREQUENCY_BULLETS + ")");
+        buyRapidBulletButton = new JButton();
         buyRapidBulletButton.addActionListener(e -> {
             if (score >= MyConstants.COST_MORE_FREQUENCY_BULLETS) {
                 if (currentBulletFrequency > MyConstants.MAX_BULLET_FQ) {
@@ -372,10 +392,11 @@ public class GameFrame extends JFrame {
             }
             drawpane.requestFocusInWindow();
         });
-        upgradePanel.add(buyRapidBulletButton);
+        
 
         // 6. Buy Shield Button
-        buyShieldButton = new JButton("Shield (Cost: " + MyConstants.COST_SHIELD + ")");
+//        buyShieldButton = new JButton("Shield (Cost: " + MyConstants.COST_SHIELD + ")");
+        buyShieldButton = new JButton();
         buyShieldButton.addActionListener(e -> {
             if (score >= MyConstants.COST_SHIELD) {
                 if (hasShield) {
@@ -390,7 +411,113 @@ public class GameFrame extends JFrame {
             }
             drawpane.requestFocusInWindow();
         });
+        
+        
+        
+        
+        buyHpButton.setIcon(new MyImageIcon(MyConstants.FILE_HP));
+        buyFasterBulletButton.setIcon(new MyImageIcon(MyConstants.FILE_FasterBullet));
+        buyFasterShipButton.setIcon(new MyImageIcon(MyConstants.FILE_FasterShip));
+        buyDoubleShotButton.setIcon(new MyImageIcon(MyConstants.FILE_DoubleShot));
+        buyRapidBulletButton.setIcon(new MyImageIcon(MyConstants.FILE_RapidFire));
+        buyShieldButton.setIcon(new MyImageIcon(MyConstants.FILE_Shield));
+        
+        RemoveBG.removeBgBtn(buyHpButton); RemoveBG.removeBgBtn(buyFasterBulletButton); RemoveBG.removeBgBtn(buyFasterShipButton);
+        RemoveBG.removeBgBtn(buyDoubleShotButton); RemoveBG.removeBgBtn(buyRapidBulletButton); RemoveBG.removeBgBtn(buyShieldButton);
+              
+        // Alignments
+        buyHpButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        buyDoubleShotButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        buyFasterBulletButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        buyFasterShipButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        buyRapidBulletButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        buyShieldButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        // Mouse Listeners
+        buyHpButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                buyHpButton.setIcon(new MyImageIcon(MyConstants.FILE_HP_Glow));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buyHpButton.setIcon(new MyImageIcon(MyConstants.FILE_HP));
+            }
+        });
+
+        buyDoubleShotButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                buyDoubleShotButton.setIcon(new MyImageIcon(MyConstants.FILE_DoubleShot_Glow));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buyDoubleShotButton.setIcon(new MyImageIcon(MyConstants.FILE_DoubleShot));
+            }
+        });
+
+        buyFasterBulletButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                buyFasterBulletButton.setIcon(new MyImageIcon(MyConstants.FILE_FasterBullet_Glow));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buyFasterBulletButton.setIcon(new MyImageIcon(MyConstants.FILE_FasterBullet));
+            }
+        });
+
+        buyFasterShipButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                buyFasterShipButton.setIcon(new MyImageIcon(MyConstants.FILE_FasterShip_Glow));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buyFasterShipButton.setIcon(new MyImageIcon(MyConstants.FILE_FasterShip));
+            }
+        });
+
+        buyRapidBulletButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                buyRapidBulletButton.setIcon(new MyImageIcon(MyConstants.FILE_RapidFire_Glow));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buyRapidBulletButton.setIcon(new MyImageIcon(MyConstants.FILE_RapidFire));
+            }
+        });
+
+        buyShieldButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                buyShieldButton.setIcon(new MyImageIcon(MyConstants.FILE_Shield_Glow));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buyShieldButton.setIcon(new MyImageIcon(MyConstants.FILE_Shield));
+            }
+        });
+
+        
+        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+        upgradePanel.add(buyHpButton);
+        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+        upgradePanel.add(buyFasterShipButton);
+        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+        upgradePanel.add(buyFasterBulletButton);
+        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+        upgradePanel.add(buyDoubleShotButton);
+        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+        upgradePanel.add(buyRapidBulletButton);
+        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
         upgradePanel.add(buyShieldButton);
+        
+        
+        
+
+        
 
         // (Req #2) JButton that opens another dialog
         // We add a "Help" button here too.
@@ -429,6 +556,7 @@ public class GameFrame extends JFrame {
     public void startAsteroidSpawner() {
         Thread spawnerThread = new Thread(() -> {
             try {
+                Thread.sleep(4000);
                 while (isGameRunning()) {
                     SwingUtilities.invokeLater(() -> {
                         if (isGameRunning()) spawnAsteroid();
@@ -445,6 +573,7 @@ public class GameFrame extends JFrame {
     public void startAutoShooter() {
         Thread shooterThread = new Thread(() -> {
             try {
+                Thread.sleep(4000);
                 while (isGameRunning()) {
                     SwingUtilities.invokeLater(() -> {
                         if (isGameRunning()) fireBullet();
@@ -582,10 +711,73 @@ public class GameFrame extends JFrame {
                 } else {
                         addGameLog("Hit! " + targetsDestroyed + "/" + targetToWin);
                     }
+                if (targetsDestroyed >= targetToWin/2) triggerBreak();
                 return; // Bullet is destroyed, stop checking other asteroids
             }
         }
     }
+    
+    public synchronized void triggerBreak() {
+        // stop game logic
+        setGameRunning(false);
+
+        // run the break sequence in a background thread
+        new Thread(() -> {
+            try {
+                // --------- "Purchase Phase" text ---------
+                JLabel label = new JLabel("Purchase Phase");
+                label.setFont(new Font("Arial", Font.BOLD, 50));
+                label.setForeground(Color.GREEN);
+                label.setBounds(
+                    0,
+                    MyConstants.GAME_PANEL_HEIGHT / 2 - 100,
+                    MyConstants.GAME_PANEL_WIDTH,
+                    100
+                );
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+
+                // add label on EDT
+                SwingUtilities.invokeLater(() -> {
+                    drawpane.add(label, 0);
+                    drawpane.revalidate();
+                    drawpane.repaint();
+                });
+
+                Thread.sleep(1000); // wait 1 sec (background thread, safe)
+
+                // --------- Countdown 5 → 1 ---------
+                for (int i = 5; i > 0; i--) {
+                    final int value = i;
+
+                    SwingUtilities.invokeLater(() -> {
+                        label.setText(String.valueOf(value));
+                        label.setForeground(Color.RED);
+                        drawpane.revalidate();
+                        drawpane.repaint();
+                    });
+
+                    Thread.sleep(1000); // 1 second between numbers
+                }
+
+                // --------- Remove label and resume game ---------
+                SwingUtilities.invokeLater(() -> {
+                    drawpane.remove(label);
+                    drawpane.revalidate();
+                    drawpane.repaint();
+                    setGameRunning(true);
+                });
+
+            } catch (InterruptedException e) {
+                // optional: handle interruption
+                SwingUtilities.invokeLater(() -> {
+                    // in case of error, make sure game continues
+                    setGameRunning(true);
+                });
+            }
+        }).start();
+    }
+
+    
     public synchronized void triggerVictory() 
     {
         setGameRunning(false);
