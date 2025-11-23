@@ -17,7 +17,8 @@ class MainApplication extends JFrame
     // components
     private JPanel             contentpane;
     private JLabel             drawpane;
-    private MyImageIcon        main_backgroundImg;    
+    private MyImageIcon        main_backgroundImg;
+    private MyImageIcon        mainIcon;      
     private MySoundEffect      clickedSound;    
     private MainApplication    currentFrame;
     private MySoundEffect      backgroundMusic;
@@ -38,14 +39,18 @@ class MainApplication extends JFrame
         vmBackground = new VolumeManagement();
         backgroundMusic = new MySoundEffect();
         backgroundMusic.setSound(MyConstants.FILE_RetroSound);
+        mainIcon = new MyImageIcon(MyConstants.FILE_ASTEROID);
         backgroundMusic.playLoop();
         backgroundMusic.setVolume(0.5f);
         
         setTitle("Space Fighter");
+        setIconImage(mainIcon.getImage());
 	setSize(framewidth, frameheight); 
         setLocationRelativeTo(null);
+        setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
+        setResizable(false);
 	setVisible(true);
-	setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
+	
         currentFrame = this;
 
 	contentpane = (JPanel)getContentPane();

@@ -17,6 +17,7 @@ import javax.swing.event.ChangeListener;
 
 public class SettingApplication extends JFrame{
     private MyImageIcon main_backgroundImg;
+    private MyImageIcon frameIcon;
     private JLabel drawpane;
     private JPanel contentpane;
     private int framewidth  = MyConstants.FRAME_WIDTH;
@@ -32,15 +33,19 @@ public class SettingApplication extends JFrame{
     private JFrame ownerFrame;
     
     public SettingApplication(JFrame ownerFrame, MySoundEffect ownerBackgroundMusic, VolumeManagement vm) {
+        
         this.vmBackground = vm;
         this.ownerBackgroundMusic = ownerBackgroundMusic;
         this.clickedSound = new MySoundEffect();
         clickedSound.setSound(MyConstants.FILE_CLICKED);
         this.ownerFrame = ownerFrame;
+        frameIcon = new MyImageIcon(MyConstants.FILE_Selected);
+        
         setTitle("Setting Menu");
         setSize(framewidth, frameheight); 
         setLocationRelativeTo(null);
 	setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
+        setIconImage(frameIcon.getImage());
         
         this.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
@@ -75,7 +80,7 @@ public class SettingApplication extends JFrame{
         
         // --------------- Select Music Themes using JComboBox 
         JPanel selectMusicPanel = new JPanel();
-        selectMusicPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        selectMusicPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 50, 0));
         JLabel musicThemeText = new JLabel();
         musicThemeText.setIcon(new MyImageIcon(MyConstants.FILE_MusicTheme));
         selectMusicPanel.add(musicThemeText);
@@ -130,8 +135,8 @@ public class SettingApplication extends JFrame{
                 
         
         // ------------- Adjust Volumne using JSlider
-        JPanel volumePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
-        volumeSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (vmBackground.getVolumeSliderBar())); 
+        JPanel volumePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 50, 0));
+        volumeSlider = new JSlider(JSlider.HORIZONTAL, 0, 150, (int) (vmBackground.getVolumeSliderBar())); 
         volumeSlider.setPreferredSize(new Dimension(150, 15));
         volumeSlider.setBackground(Color.WHITE);
         volumeSlider.setOpaque(true);
@@ -154,17 +159,21 @@ public class SettingApplication extends JFrame{
         
         // --------------- Mute Unmute using RadioButton
         JPanel mutePanel = new JPanel();
-        mutePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        mutePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 50, 0));
         ButtonGroup buttongroup = new ButtonGroup();
         mute = new JRadioButton("Mute");
         unmute = new JRadioButton("Unmute");
         
         mute.setFont(largeFont);
         mute.setForeground(Color.WHITE);
+        mute.setOpaque(false);
+        mute.setFocusPainted(false);
         mute.setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
         
         unmute.setFont(largeFont);
         unmute.setForeground(Color.WHITE);
+        unmute.setOpaque(false);
+        unmute.setFocusPainted(false);
         unmute.setIcon(new MyImageIcon(MyConstants.FILE_Selected));
         
         buttongroup.add(mute);

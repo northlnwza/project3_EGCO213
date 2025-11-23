@@ -21,6 +21,7 @@ public class GameMain extends JFrame {
     private JFrame currentFrame;
     private JLabel drawpane;
     private JPanel contentpane;
+    private MyImageIcon frameIcon;
     private MySoundEffect backgroundMusic;
     private VolumeManagement vm;
     private MySoundEffect clickedSound;
@@ -44,13 +45,15 @@ public class GameMain extends JFrame {
         this.mainFrame = mainFrame;
         this.clickedSound = new MySoundEffect();
         clickedSound.setSound(MyConstants.FILE_CLICKED);
+        frameIcon = new MyImageIcon(MyConstants.FILE_Selected);
         
         setTitle("Space Fighter - Set Game Play");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(MyConstants.FRAME_WIDTH, MyConstants.FRAME_HEIGHT);
         setLocationRelativeTo(null);
-        setResizable(true);
-        setLayout(new BorderLayout());        
+        setResizable(false);
+        setLayout(new BorderLayout());  
+        setIconImage(frameIcon.getImage());
         currentFrame = this;
         setVisible(true);
         
@@ -89,8 +92,11 @@ public class GameMain extends JFrame {
         radioPanel.setMaximumSize(new Dimension(300, 100));
         for (int i = 0; i < difficulties.length; i++) {
             difficultyRadios[i] = new JRadioButton(difficulties[i]);
-            difficultyRadios[i].setFont(new Font("Arial", Font.PLAIN, 18));
+            difficultyRadios[i].setFont(new Font("Arial", Font.PLAIN, 20));
             difficultyRadios[i].setForeground(Color.WHITE);
+            difficultyRadios[i].setContentAreaFilled(false);
+            difficultyRadios[i].setOpaque(false);
+            difficultyRadios[i].setFocusPainted(false);
             difficultyGroup.add(difficultyRadios[i]);
             radioPanel.add(difficultyRadios[i]);
         }
