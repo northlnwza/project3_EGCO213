@@ -27,6 +27,8 @@ public class GameFrame extends JFrame {
     private MySoundEffect   themeSound;
     private MySoundEffect   clickedSound;
     private VolumeManagement vm; 
+    private JPanel          southPanel;
+    private JPanel          eastPanel;
 
     // --- Game State ---
     private int score = 0;
@@ -57,22 +59,28 @@ public class GameFrame extends JFrame {
     private MySoundEffect playerHitSound;
 
     // --- Thread Management ---
-    private List<Thread> entityThreads = new ArrayList<>();
-    private List<Asteroid> asteroids = new ArrayList<>();
-    private List<Bullet> bullets = new ArrayList<>();
+    private List<Thread>    entityThreads = new ArrayList<>();
+    private List<Asteroid>  asteroids = new ArrayList<>();
+    private List<Bullet>    bullets = new ArrayList<>();
 
     // --- GUI Components ---
-    private JTextArea gameLogArea;
-    private JButton buyHpButton;
-    private JButton buyFasterShipButton;
-    private JButton buyFasterBulletButton;
-    private JButton buyDoubleShotButton;
-    private JButton buyRapidBulletButton;
-    private JButton buyShieldButton;
-    private JButton mainMenuButton; // <-- NEW: Button to go back
-    private JTextField scoreText;
-    private JTextField hpText;
-    private JLabel playerLabel; // To show player's name
+    private JLabel      gameLogLabel; // This is Log screen
+    private JTextArea   gameLogArea;
+    private MyImageIcon gameLogImage;
+    private JPanel      upgradePanel; // This is upgrade panel
+    private JLabel      upgradeLabel;
+    private JButton     buyHpButton;
+    private JButton     buyFasterShipButton;
+    private JButton     buyFasterBulletButton;
+    private JButton     buyDoubleShotButton;
+    private JButton     buyRapidBulletButton;
+    private JButton     buyShieldButton;
+    private JButton     mainMenuButton; // <-- NEW: Button to go back
+    private JButton     helpButton;     // Button for info
+    private JPanel      statusPanel;
+    private JTextField  scoreText;
+    private JTextField  hpText;
+    private JLabel      playerLabel; // To show player's name
 
 
     // Constructor now accepts settings from the menu
@@ -231,7 +239,9 @@ public class GameFrame extends JFrame {
                     playerRocket.moveRight();
                 }else if (keyCode == KeyEvent.VK_ESCAPE) 
                 {
+                    setGameRunning(false);
                     openSettingsMenu();
+                    setGameRunning(true);
                 }
             }
         });
@@ -241,15 +251,15 @@ public class GameFrame extends JFrame {
         drawpane.requestFocusInWindow();
 
         // --- SOUTH: Game Status & Upgrades ---
-//        JPanel southPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-        JPanel southPanel = new JPanel();
+        
+        southPanel = new JPanel();
         southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.Y_AXIS));
         southPanel.setPreferredSize(new Dimension(0, 110));
 //        southPanel.setOpaque(false);
         southPanel.setBackground(Color.BLACK);
         
         // Panel for HP and Score
-        JPanel statusPanel = new JPanel();
+        statusPanel = new JPanel();
 //        statusPanel.setBounds(0, 0, 0, 50);
         statusPanel.setOpaque(false);
 //        statusPanel.setBackground(Color.BLACK);
@@ -270,16 +280,11 @@ public class GameFrame extends JFrame {
         scoreText.setEditable(false);
         statusPanel.add(scoreText);
         
-        // --- NEW: Main Menu Button in Status Panel ---
-        mainMenuButton = new JButton("Resign");
-        mainMenuButton.addActionListener(e -> {
-            triggerGameOver();
-        });
-        statusPanel.add(mainMenuButton);
+        
         
         
         // Panel for new upgrade buttons
-        JPanel upgradePanel = new JPanel();
+        upgradePanel = new JPanel();
 //        upgradePanel.setBackground(Color.BLACK);
         upgradePanel.setOpaque(false);
         upgradePanel.setLayout(new BoxLayout(upgradePanel, BoxLayout.X_AXIS));
@@ -412,9 +417,24 @@ public class GameFrame extends JFrame {
             drawpane.requestFocusInWindow();
         });
         
+        // --- NEW: Main Menu Button in South Panel ---
+        mainMenuButton = new JButton();
+        mainMenuButton.addActionListener(e -> {
+            triggerGameOver();
+        });
+            
+        // We add a "Help" button here too.
+        helpButton = new JButton();
+        helpButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(currentFrame, 
+                "Space Defender\n\n- Use A/D or Left/Right arrows to move.\n- Shooting is automatic.\n- Asteroids hitting you or the ground cost 1 HP.\n- Buy upgrades to survive longer!",
+                "Help & Info",
+                JOptionPane.INFORMATION_MESSAGE);
+            drawpane.requestFocusInWindow();
+        });
         
-        
-        
+        mainMenuButton.setIcon(new MyImageIcon(MyConstants.FILE_Resign));
+        helpButton.setIcon(new MyImageIcon(MyConstants.FILE_Help));
         buyHpButton.setIcon(new MyImageIcon(MyConstants.FILE_HP));
         buyFasterBulletButton.setIcon(new MyImageIcon(MyConstants.FILE_FasterBullet));
         buyFasterShipButton.setIcon(new MyImageIcon(MyConstants.FILE_FasterShip));
@@ -422,10 +442,13 @@ public class GameFrame extends JFrame {
         buyRapidBulletButton.setIcon(new MyImageIcon(MyConstants.FILE_RapidFire));
         buyShieldButton.setIcon(new MyImageIcon(MyConstants.FILE_Shield));
         
+        RemoveBG.removeBgBtn(mainMenuButton); RemoveBG.removeBgBtn(helpButton);
         RemoveBG.removeBgBtn(buyHpButton); RemoveBG.removeBgBtn(buyFasterBulletButton); RemoveBG.removeBgBtn(buyFasterShipButton);
         RemoveBG.removeBgBtn(buyDoubleShotButton); RemoveBG.removeBgBtn(buyRapidBulletButton); RemoveBG.removeBgBtn(buyShieldButton);
               
         // Alignments
+        mainMenuButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        helpButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         buyHpButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         buyDoubleShotButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         buyFasterBulletButton.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -434,6 +457,28 @@ public class GameFrame extends JFrame {
         buyShieldButton.setAlignmentY(Component.CENTER_ALIGNMENT);
 
         // Mouse Listeners
+        mainMenuButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                mainMenuButton.setIcon(new MyImageIcon(MyConstants.FILE_Resign_Glow));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                mainMenuButton.setIcon(new MyImageIcon(MyConstants.FILE_Resign));
+            }
+        });
+        
+//        helpButton.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseEntered(MouseEvent e) {
+//                helpButton.setIcon(new MyImageIcon(MyConstants.FILE_HP_Glow));
+//            }
+//            @Override
+//            public void mouseExited(MouseEvent e) {
+//                helpButton.setIcon(new MyImageIcon(MyConstants.FILE_HP));
+//            }
+//        });
+        
         buyHpButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -501,54 +546,77 @@ public class GameFrame extends JFrame {
         });
 
         
-        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+//        upgradePanel.add(Box.createRigidArea(new Dimension(20, 0)));
         upgradePanel.add(buyHpButton);
-        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyFasterShipButton);
-        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyFasterBulletButton);
-        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyDoubleShotButton);
-        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyRapidBulletButton);
-        upgradePanel.add(Box.createRigidArea(new Dimension(65, 0)));
+//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyShieldButton);
-        
-        
-        
-
-        
-
-        // (Req #2) JButton that opens another dialog
-        // We add a "Help" button here too.
-        JButton helpButton = new JButton("Help/Info");
-        helpButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(currentFrame, 
-                "Space Defender\n\n- Use A/D or Left/Right arrows to move.\n- Shooting is automatic.\n- Asteroids hitting you or the ground cost 1 HP.\n- Buy upgrades to survive longer!",
-                "Help & Info",
-                JOptionPane.INFORMATION_MESSAGE);
-            drawpane.requestFocusInWindow();
-        });
-        statusPanel.add(helpButton);
+//        upgradePanel.add(Box.createHorizontalStrut(65));
+        upgradePanel.add(buyShieldButton);
+        upgradePanel.add(Box.createHorizontalStrut(80));
+        upgradePanel.add(mainMenuButton);
+        upgradePanel.add(helpButton);
 
 
         southPanel.add(statusPanel);
         southPanel.add(upgradePanel);
 
+        
         // --- EAST: Game Log ---
+        eastPanel = new JPanel();
+        eastPanel.setPreferredSize(new Dimension(MyConstants.EAST_PANEL_WIDTH,0));
+        eastPanel.setBackground(Color.BLACK);
+        eastPanel.setOpaque(false);
+        
+        gameLogImage = new MyImageIcon(MyConstants.FILE_CONSOLE);
+        
+        gameLogLabel = new JLabel(gameLogImage);
+        gameLogLabel.setLayout(new BorderLayout());
+        gameLogLabel.setOpaque(false);
+        
         // (Req #2) JTextArea
-        gameLogArea = new JTextArea(10, 20);
+        gameLogArea = new JTextArea(1, 1);
         gameLogArea.setEditable(false);
+        gameLogArea.setFont(new Font("Monospaced", Font.PLAIN, 10));
+        gameLogArea.setForeground(Color.GREEN);
+        gameLogArea.setOpaque(false);
+        
+ 
+
+        gameLogArea.append("\n\n\n\n      [CONNECTION SUCCESSFUL]\n");
+        addGameLog("-".repeat(25));
+        gameLogArea.append("      > Threat Level : {" + difficulty + "}\n" +
+                           "      > Location     :\n" +
+                           "      Outer Ring – Sector 7G\n" +
+                           "      > Objective    :\n" + 
+                           "      Survive the incoming wave\n");
+        addGameLog("-".repeat(25));
+        gameLogArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
         JScrollPane logScrollPane = new JScrollPane(gameLogArea);
-        logScrollPane.setPreferredSize(new Dimension(MyConstants.EAST_PANEL_WIDTH, 0)); 
-        gameLogArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        gameLogArea.append("Game Started, " + playerName + "!\n");
-        gameLogArea.append("Difficulty: " + difficulty + "\n");
+        logScrollPane.setOpaque(false);
+        logScrollPane.getViewport().setOpaque(false);
+        logScrollPane.setBorder(null);
+        
+        gameLogLabel.add(logScrollPane, BorderLayout.CENTER);
+        eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.X_AXIS));
+        eastPanel.add(Box.createHorizontalGlue());
+        eastPanel.add(gameLogLabel, BorderLayout.CENTER);
+        eastPanel.add(Box.createHorizontalGlue());
+        
+        
 
         // --- Add all panels to the content pane ---
         contentpane.add(drawpane, BorderLayout.CENTER);
         contentpane.add(southPanel, BorderLayout.SOUTH);
-        contentpane.add(logScrollPane, BorderLayout.EAST);
+        contentpane.add(eastPanel, BorderLayout.EAST);
     }
     
     // --- Thread Spawners ---
@@ -557,11 +625,13 @@ public class GameFrame extends JFrame {
         Thread spawnerThread = new Thread(() -> {
             try {
                 Thread.sleep(4000);
-                while (isGameRunning()) {
-                    SwingUtilities.invokeLater(() -> {
-                        if (isGameRunning()) spawnAsteroid();
-                    });
-                    Thread.sleep(currentSpawnDelay);
+                while (true) {
+                    while (isGameRunning()) {
+                        SwingUtilities.invokeLater(() -> {
+                            if (isGameRunning()) spawnAsteroid();
+                        });
+                        Thread.sleep(currentSpawnDelay);
+                    }
                 }
             } catch (InterruptedException e) {
                 System.out.println("Asteroid Spawner thread interrupted.");
@@ -574,11 +644,13 @@ public class GameFrame extends JFrame {
         Thread shooterThread = new Thread(() -> {
             try {
                 Thread.sleep(4000);
-                while (isGameRunning()) {
-                    SwingUtilities.invokeLater(() -> {
-                        if (isGameRunning()) fireBullet();
-                    });
-                    Thread.sleep(currentBulletFrequency);
+                while (true) {
+                    while (isGameRunning()) {
+                        SwingUtilities.invokeLater(() -> {
+                            if (isGameRunning()) fireBullet();
+                        });
+                        Thread.sleep(currentBulletFrequency);
+                    }
                 }
             } catch (InterruptedException e) {
                 System.out.println("Auto-Shooter thread interrupted.");
@@ -678,40 +750,61 @@ public class GameFrame extends JFrame {
 
     public synchronized void checkBulletCollisions(Bullet bullet) {
         if (!bullet.isRunning()) return;
-        
-        // Loop BACKWARDS through the list by Index
+
         for (int i = asteroids.size() - 1; i >= 0; i--) {
             Asteroid asteroid = asteroids.get(i);
-            
+
             if (asteroid.isRunning() && bullet.getBounds().intersects(asteroid.getBounds())) {
                 // Collision!
                 explosionSound.playOnce();
-                
-                bullet.stopThread();    // Stop bullet thread
-                
-                // 1. Stop the Asteroid Thread
+
+                // stop bullet and asteroid movement
+                bullet.stopThread();
                 asteroid.stopThreadOnly();
-                
-                // 2. Remove Visuals
-                removeEntityGUI(asteroid);
-                
-                // 3. Remove from List using Index (Safe because we are looping backwards)
-                asteroids.remove(i);
-                
+
+                // Keep a final reference for the inner classes
+                Asteroid hitAsteroid = asteroid;
+
+                new Thread(() -> {
+                    // 1) Show explosion (on EDT)
+                    SwingUtilities.invokeLater(() -> {
+                        hitAsteroid.Explosion();   // setIcon(explosionImg)
+                        drawpane.revalidate();
+                        drawpane.repaint();
+                    });
+
+                    // 2) Wait for explosion to be visible
+                    try { Thread.sleep(300); } catch (InterruptedException e) {} // 0.3sec
+
+                    // 3) Now remove asteroid from GUI and list (on EDT)
+                    SwingUtilities.invokeLater(() -> {
+                        removeEntityGUI(hitAsteroid);   // your existing method
+                        asteroids.remove(hitAsteroid);  // remove by object, not index
+                        drawpane.revalidate();
+                        drawpane.repaint();
+                    });
+                }).start();
+
+        
                 addScore(10);
                 targetsDestroyed++;
                 long reduction = (long)(targetsDestroyed * difficultyRampFactor);
                 currentSpawnDelay = Math.max(minSpawnDelay, baseSpawnDelay - reduction);
                 addGameLog("Asteroid destroyed! +10");
-                String showspawnrate = String.format("spawn[object/ms]: %d", currentSpawnDelay);
-                addGameLog(showspawnrate);
+                //String showspawnrate = String.format("spawn[object/ms]: %d", currentSpawnDelay);
+//                addGameLog(showspawnrate);
                 if (targetsDestroyed >= targetToWin) 
                 {
-                        triggerVictory();
+                    triggerVictory();
                 } else {
                         addGameLog("Hit! " + targetsDestroyed + "/" + targetToWin);
-                    }
-                if (targetsDestroyed >= targetToWin/2) triggerBreak();
+                       }
+                if (targetsDestroyed == targetToWin/2) 
+                {
+                    triggerBreak();
+//                    startAutoShooter();
+//                    startAsteroidSpawner();
+                }
                 return; // Bullet is destroyed, stop checking other asteroids
             }
         }
@@ -719,11 +812,11 @@ public class GameFrame extends JFrame {
     
     public synchronized void triggerBreak() {
         // stop game logic
-        setGameRunning(false);
-
+        
         // run the break sequence in a background thread
         new Thread(() -> {
             try {
+                setGameRunning(false);
                 // --------- "Purchase Phase" text ---------
                 JLabel label = new JLabel("Purchase Phase");
                 label.setFont(new Font("Arial", Font.BOLD, 50));
@@ -743,10 +836,10 @@ public class GameFrame extends JFrame {
                     drawpane.repaint();
                 });
 
-                Thread.sleep(1000); // wait 1 sec (background thread, safe)
+                Thread.sleep(2500); // wait 2.5 sec (background thread, safe)
 
                 // --------- Countdown 5 → 1 ---------
-                for (int i = 5; i > 0; i--) {
+                for (int i = 3; i > 0; i--) {
                     final int value = i;
 
                     SwingUtilities.invokeLater(() -> {
@@ -756,7 +849,7 @@ public class GameFrame extends JFrame {
                         drawpane.repaint();
                     });
 
-                    Thread.sleep(1000); // 1 second between numbers
+                    Thread.sleep(1200); // 1.2 second between numbers
                 }
 
                 // --------- Remove label and resume game ---------
@@ -774,7 +867,9 @@ public class GameFrame extends JFrame {
                     setGameRunning(true);
                 });
             }
+                    setGameRunning(true);
         }).start();
+        
     }
 
     
@@ -861,7 +956,7 @@ public class GameFrame extends JFrame {
     }
 
     public void addGameLog(String message) {
-        gameLogArea.append(message + "\n");
+        gameLogArea.append("      " + message + "\n");
         gameLogArea.setCaretPosition(gameLogArea.getDocument().getLength()); // Auto-scroll
     }
     

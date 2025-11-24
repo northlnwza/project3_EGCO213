@@ -25,7 +25,7 @@ class PlayerRocket extends JLabel {
 
     public PlayerRocket(GameFrame pf) { // Changed from MainApplication
         parentFrame = pf;
-        rocketImg = new MyImageIcon(MyConstants.FILE_ROCKET).resize(MyConstants.ROCKET_WIDTH, MyConstants.ROCKET_HEIGHT);
+        rocketImg = new MyImageIcon(MyConstants.FILE_ROCKET2).resize(MyConstants.ROCKET_WIDTH, MyConstants.ROCKET_HEIGHT);
         setIcon(rocketImg);
 
         // This calculation now uses the CORRECTED GAME_PANEL_HEIGHT (700px)
@@ -67,6 +67,7 @@ class PlayerRocket extends JLabel {
 class Asteroid extends JLabel implements Runnable {
     private GameFrame parentFrame; // Changed from MainApplication
     private MyImageIcon asteroidImg;
+    private MyImageIcon explosionImg;
     private int curX, curY;
     private int speed; // Instance speed
     private int width, height; // Instance size
@@ -96,12 +97,16 @@ class Asteroid extends JLabel implements Runnable {
                 break;
         }
         asteroidImg = new MyImageIcon(MyConstants.FILE_ASTEROID).resize(this.width, this.height);
+        explosionImg = new MyImageIcon(MyConstants.FILE_EXPLOSION).resize(this.width, this.height);
         setIcon(asteroidImg);
 
         curX = startX;
         curY = -this.height;
         setBounds(curX, curY, this.width, this.height);
     }
+    
+    
+    public void Explosion() { setIcon(explosionImg); }
 
     /**
      * COMMAND A: "Destroyed by Bullet"
@@ -132,6 +137,8 @@ class Asteroid extends JLabel implements Runnable {
 
             if (isRunning && this.getBounds().intersects(parentFrame.getPlayerRocket().getBounds())) {
                 parentFrame.loseHealth(1);
+                Explosion();
+                try { Thread.sleep(350); } catch(InterruptedException e) {}
                 stopThreadAndRemoveFromList(); // Use the full remove method
                 break;
             }

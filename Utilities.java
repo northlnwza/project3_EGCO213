@@ -29,8 +29,10 @@ interface MyConstants
     static final String FILE_GameLogo_Glow  = PATH + "gamelogo-glow.png";
     static final String FILE_Credits        = PATH + "credits.png";
     static final String FILE_Credits_Glow   = PATH + "credits-glow.png";
+    static final String FILE_CreditsMenu    = PATH + "creditsmenu.png";
     static final String FILE_Howto          = PATH + "howtoplay.png";
     static final String FILE_Howto_Glow     = PATH + "howtoplay-glow.png";
+    static final String FILE_HowtoPlayMenu  = PATH + "howtoplaymenu.png";
     static final String FILE_Save           = PATH + "save.png";
     static final String FILE_Save_Glow      = PATH + "save-glow.png";
     static final String FILE_BoxSettingMenu = PATH + "box-settingmenu.png";
@@ -47,6 +49,9 @@ interface MyConstants
     static final String FILE_BackMenu       = PATH + "backmenu.png";
     static final String FILE_BackMenu_Glow  = PATH + "backmenu-glow.png";
     static final String FILE_PlayIcon       = PATH + "spaceship1.png";
+    static final String FILE_Resign         = PATH + "resign.png";
+    static final String FILE_Resign_Glow    = PATH + "resign-glow.png";
+    static final String FILE_Help           = PATH + "help.png";
     static final String FILE_HP             = PATH + "hp.png";
     static final String FILE_HP_Glow        = PATH + "hp-glow.png";
     static final String FILE_FasterBullet   = PATH + "fasterbullet.png";
@@ -63,8 +68,11 @@ interface MyConstants
     
     // gameplay background
     static final String FILE_BACKGROUND     = PATH + "background.jpg";
+    static final String FILE_CONSOLE        = PATH + "console_log.png";
     static final String FILE_ROCKET         = PATH + "rocket.png";
+    static final String FILE_ROCKET2        = PATH + "rocket2.png";
     static final String FILE_ASTEROID       = PATH + "asteroid.png";
+    static final String FILE_EXPLOSION      = PATH + "explosion.png";
     static final String FILE_BULLET         = PATH + "bullet.png";
 
     // game play sound

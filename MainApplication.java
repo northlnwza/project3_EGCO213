@@ -153,6 +153,8 @@ class MainApplication extends JFrame
             @Override
             public void actionPerformed(ActionEvent e) {
                 clickedSound.playOnce();
+                currentFrame.setVisible(false);
+                new HowtoPlay(currentFrame, backgroundMusic, vmBackground);
             }
         });
         
@@ -169,6 +171,8 @@ class MainApplication extends JFrame
             @Override
             public void actionPerformed(ActionEvent e) {
                 clickedSound.playOnce();
+                currentFrame.setVisible(false);
+                new Credits(currentFrame, backgroundMusic, vmBackground);
             }
         });
         mainMenu.setOpaque(false);

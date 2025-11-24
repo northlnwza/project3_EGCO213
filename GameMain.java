@@ -45,7 +45,7 @@ public class GameMain extends JFrame {
         this.mainFrame = mainFrame;
         this.clickedSound = new MySoundEffect();
         clickedSound.setSound(MyConstants.FILE_CLICKED);
-        frameIcon = new MyImageIcon(MyConstants.FILE_PlayIcon);
+        frameIcon = new MyImageIcon(MyConstants.FILE_GameLogo);
         
         setTitle("Space Fighter - Set Game Play");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
