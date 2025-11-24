@@ -20,6 +20,7 @@ public class GameFrame extends JFrame {
     private JPanel          contentpane;
     private JLabel          drawpane; // This is the "game screen"
     private MyImageIcon     backgroundImg;
+    private MyImageIcon     frameIcon;
     private GameFrame       currentFrame;
     private JFrame          mainFrame;       // Reference to the Main Menu
     private PlayerRocket    playerRocket;
@@ -69,6 +70,7 @@ public class GameFrame extends JFrame {
     private MyImageIcon gameLogImage;
     private JPanel      upgradePanel; // This is upgrade panel
     private JLabel      upgradeLabel;
+    private MyImageIcon upgradeConsoleImage;
     private JButton     buyHpButton;
     private JButton     buyFasterShipButton;
     private JButton     buyFasterBulletButton;
@@ -93,8 +95,11 @@ public class GameFrame extends JFrame {
         themeSound = backgroundMusic;
         vm = v;
         
+        frameIcon = new MyImageIcon(MyConstants.FILE_PlayIcon);
+        
         applyDifficultySettings(difficulty);
         setTitle("Space Fighter - " + playerName + " accepted " + difficulty + " mission.");
+        setIconImage(frameIcon.getImage());
         setSize(MyConstants.FRAME_WIDTH, MyConstants.FRAME_HEIGHT);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Should probably be DISPOSE_ON_CLOSE if main stays open
@@ -255,7 +260,7 @@ public class GameFrame extends JFrame {
         southPanel = new JPanel();
         southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.Y_AXIS));
         southPanel.setPreferredSize(new Dimension(0, 110));
-//        southPanel.setOpaque(false);
+        southPanel.setOpaque(false);
         southPanel.setBackground(Color.BLACK);
         
         // Panel for HP and Score
@@ -281,14 +286,12 @@ public class GameFrame extends JFrame {
         statusPanel.add(scoreText);
         
         
-        
-        
         // Panel for new upgrade buttons
         upgradePanel = new JPanel();
-//        upgradePanel.setBackground(Color.BLACK);
+        upgradePanel.setBackground(Color.BLACK);
         upgradePanel.setOpaque(false);
         upgradePanel.setLayout(new BoxLayout(upgradePanel, BoxLayout.X_AXIS));
-//        upgradePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        
       
         // --- (Req #3) All these buttons have ActionListeners ---
 
@@ -468,16 +471,16 @@ public class GameFrame extends JFrame {
             }
         });
         
-//        helpButton.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseEntered(MouseEvent e) {
-//                helpButton.setIcon(new MyImageIcon(MyConstants.FILE_HP_Glow));
-//            }
-//            @Override
-//            public void mouseExited(MouseEvent e) {
-//                helpButton.setIcon(new MyImageIcon(MyConstants.FILE_HP));
-//            }
-//        });
+        helpButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                helpButton.setIcon(new MyImageIcon(MyConstants.FILE_Help_Glow));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                helpButton.setIcon(new MyImageIcon(MyConstants.FILE_Help));
+            }
+        });
         
         buyHpButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -547,6 +550,7 @@ public class GameFrame extends JFrame {
 
         
 //        upgradePanel.add(Box.createRigidArea(new Dimension(20, 0)));
+//        upgradePanel.add(Box.createHorizontalStrut(200));
         upgradePanel.add(buyHpButton);
 //        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyFasterShipButton);
@@ -560,14 +564,25 @@ public class GameFrame extends JFrame {
         upgradePanel.add(buyShieldButton);
 //        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyShieldButton);
-        upgradePanel.add(Box.createHorizontalStrut(80));
+//        upgradePanel.add(Box.createHorizontalStrut(130));
         upgradePanel.add(mainMenuButton);
         upgradePanel.add(helpButton);
 
+        upgradeConsoleImage = new MyImageIcon(MyConstants.FILE_UPGRADE_CONSOLE);
+        
+        upgradeLabel = new JLabel(upgradeConsoleImage);
+//        upgradeLabel.setLayout(new BoxLayout(upgradeLabel, BoxLayout.Y_AXIS));
+        upgradeLabel.setLayout(new BorderLayout());
+        upgradeLabel.setOpaque(false);
+        
+//        statusPanel.setAlignmentY(TOP_ALIGNMENT);
+        upgradePanel.setAlignmentY(CENTER_ALIGNMENT);
+        upgradeLabel.add(statusPanel, BorderLayout.NORTH);
+        upgradeLabel.add(upgradePanel, BorderLayout.CENTER);
+//        upgradeLabel.add(mainMenuButton, BorderLayout.EAST);
+//        upgradeLabel.add(helpButton, BorderLayout.EAST);
 
-        southPanel.add(statusPanel);
-        southPanel.add(upgradePanel);
-
+        southPanel.add(upgradeLabel);
         
         // --- EAST: Game Log ---
         eastPanel = new JPanel();
@@ -575,7 +590,7 @@ public class GameFrame extends JFrame {
         eastPanel.setBackground(Color.BLACK);
         eastPanel.setOpaque(false);
         
-        gameLogImage = new MyImageIcon(MyConstants.FILE_CONSOLE);
+        gameLogImage = new MyImageIcon(MyConstants.FILE_LOG_CONSOLE);
         
         gameLogLabel = new JLabel(gameLogImage);
         gameLogLabel.setLayout(new BorderLayout());

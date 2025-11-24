@@ -52,6 +52,7 @@ interface MyConstants
     static final String FILE_Resign         = PATH + "resign.png";
     static final String FILE_Resign_Glow    = PATH + "resign-glow.png";
     static final String FILE_Help           = PATH + "help.png";
+    static final String FILE_Help_Glow      = PATH + "help-glow.png";
     static final String FILE_HP             = PATH + "hp.png";
     static final String FILE_HP_Glow        = PATH + "hp-glow.png";
     static final String FILE_FasterBullet   = PATH + "fasterbullet.png";
@@ -68,7 +69,8 @@ interface MyConstants
     
     // gameplay background
     static final String FILE_BACKGROUND     = PATH + "background.jpg";
-    static final String FILE_CONSOLE        = PATH + "console_log.png";
+    static final String FILE_UPGRADE_CONSOLE  = PATH + "console_upgrade.png";
+    static final String FILE_LOG_CONSOLE    = PATH + "console_log.png";
     static final String FILE_ROCKET         = PATH + "rocket.png";
     static final String FILE_ROCKET2        = PATH + "rocket2.png";
     static final String FILE_ASTEROID       = PATH + "asteroid.png";
@@ -99,7 +101,7 @@ interface MyConstants
     
         // --- NEW: Define the panel sizes ---
     // We reserve space for the top, bottom, and side panels
-    static final int SOUTH_PANEL_HEIGHT = 100; // Approx. height of your 2-row south panel
+    static final int SOUTH_PANEL_HEIGHT = 140; // Approx. height of your 2-row south panel
     static final int EAST_PANEL_WIDTH = 250;   // Approx. width of your JTextArea log
     
     // --- NEW: Define the *actual* game area size ---
