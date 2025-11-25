@@ -322,11 +322,11 @@ public class GameFrame extends JFrame {
                     // Check if we just hit the max
                     if (currentPlayerSpeed >= MyConstants.MAX_PLAYER_SPEED) {
                         buyFasterShipButton.setEnabled(false);
-                        buyFasterShipButton.setText("Ship Speed MAXED");
+//                        buyFasterShipButton.setText("Ship Speed MAXED");
                     }
                 } else {
                     buyFasterShipButton.setEnabled(false);
-                    buyFasterShipButton.setText("Ship Speed MAXED");
+//                    buyFasterShipButton.setText("Ship Speed MAXED");
                 }
             } else {
                 addGameLog("Not enough score for faster ship!");
@@ -347,11 +347,11 @@ public class GameFrame extends JFrame {
                     // Check if we just hit the max
                     if (currentBulletSpeed >= MyConstants.MAX_BULLET_SPEED) {
                         buyFasterBulletButton.setEnabled(false);
-                        buyFasterBulletButton.setText("Bullet SP MAXED");
+//                        buyFasterBulletButton.setText("Bullet SP MAXED");
                     }
                 } else {
                     buyFasterBulletButton.setEnabled(false);
-                    buyFasterBulletButton.setText("Bullet SP MAXED");
+//                    buyFasterBulletButton.setText("Bullet SP MAXED");
                 }
             } else {
                 addGameLog("Not enough score for faster bullets!");
@@ -368,7 +368,7 @@ public class GameFrame extends JFrame {
                 hasDoubleShot = true;
                 addGameLog("Double Shot active!");
                 ((JButton)e.getSource()).setEnabled(false); // One-time purchase
-                buyDoubleShotButton.setText("Bought Double Shot");
+//                buyDoubleShotButton.setText("Bought Double Shot");
             } else {
                 addGameLog("Not enough score for Double Shot!");
             }
@@ -388,11 +388,11 @@ public class GameFrame extends JFrame {
                     // Check if we just hit the max
                     if (currentBulletFrequency <= MyConstants.MAX_BULLET_SPEED) {
                         buyRapidBulletButton.setEnabled(false);
-                        buyRapidBulletButton.setText("Bullet FQ MAXED");
+//                        buyRapidBulletButton.setText("Bullet FQ MAXED");
                     }
                 } else {
                     buyRapidBulletButton.setEnabled(false);
-                    buyRapidBulletButton.setText("Bullet FQ MAXED");
+//                    buyRapidBulletButton.setText("Bullet FQ MAXED");
                 }
 
             } else {
