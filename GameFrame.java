@@ -5,7 +5,7 @@ Phurinut Wongwatcharapaiboon 6713245
 Jitchaya Hirunsri 6713222
 Tanop Udomkanaruck 6713233
  */
-package Project3_6713118; // Make sure to rename XXX to your ID
+package Project3_6713118;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -54,7 +54,6 @@ public class GameFrame extends JFrame {
     private boolean hasDoubleShot = false;
     private boolean hasShield = false;
     
-    // --- FIX 1: Pre-load all sounds to crush Sound I/O lag ---
     private MySoundEffect laserSound;
     private MySoundEffect explosionSound;
     private MySoundEffect playerHitSound;
@@ -77,8 +76,8 @@ public class GameFrame extends JFrame {
     private JButton     buyDoubleShotButton;
     private JButton     buyRapidBulletButton;
     private JButton     buyShieldButton;
-    private JButton     mainMenuButton; // <-- NEW: Button to go back
-    private JButton     helpButton;     // Button for info
+    private JButton     mainMenuButton; 
+    private JButton     helpButton;
     private JPanel      statusPanel;
     private JTextField  scoreText;
     private JTextField  hpText;
@@ -102,26 +101,24 @@ public class GameFrame extends JFrame {
         setIconImage(frameIcon.getImage());
         setSize(MyConstants.FRAME_WIDTH, MyConstants.FRAME_HEIGHT);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Should probably be DISPOSE_ON_CLOSE if main stays open
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // (Req #3) We need 4 event handlers.
-        // We add a WindowListener for game shutdown logic.
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                stopGame(); // Helper method to stop everything
-                mainFrame.setVisible(true); // Show main menu
+                stopGame();
+                mainFrame.setVisible(true);
             }
             @Override
             public void windowClosing(WindowEvent e) {
                 stopGame();
                 mainFrame.setVisible(true);
-                // The default close operation is EXIT_ON_CLOSE, so we might need to change that
-                // or just let dispose() handle it if we change default close op.
+
             }
         });
         
-        // IMPORTANT: change to DISPOSE so we don't kill the whole app, just this window
+        //change to DISPOSE so we don't kill the whole app, just this window
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         contentpane = (JPanel) getContentPane();
@@ -196,21 +193,13 @@ public class GameFrame extends JFrame {
         }
     }
     public void openSettingsMenu() {
-        // 1. Pause the game logic
-        
-        // 2. Hide the game window (SettingApplication does this to owner, but let's be explicit)
         this.setVisible(false);
         
-        // 3. Create the Settings Frame
-        // We pass 'this' (GameFrame) as the owner, so when Settings closes, GameFrame re-appears.
         SettingApplication settings = new SettingApplication(this, themeSound, vm);
-        
-        // 4. Add a listener to resume game when settings close
         settings.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                // Resume the game!
-                // Ensure focus returns to drawpane for keyboard controls
+
                 drawpane.requestFocusInWindow(); 
             }
         });
@@ -233,7 +222,6 @@ public class GameFrame extends JFrame {
         playerRocket = new PlayerRocket(currentFrame);
         drawpane.add(playerRocket);
 
-        // (Req #3) This is our required KeyEvent handler
         drawpane.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -251,12 +239,11 @@ public class GameFrame extends JFrame {
             }
         });
 
-        // Critical for KeyListener to work on a JLabel
+        //for KeyListener to work on a JLabel
         drawpane.setFocusable(true);
         drawpane.requestFocusInWindow();
 
         // --- SOUTH: Game Status & Upgrades ---
-        
         southPanel = new JPanel();
         southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.Y_AXIS));
         southPanel.setPreferredSize(new Dimension(0, 110));
@@ -292,11 +279,9 @@ public class GameFrame extends JFrame {
         upgradePanel.setOpaque(false);
         upgradePanel.setLayout(new BoxLayout(upgradePanel, BoxLayout.X_AXIS));
         
-      
-        // --- (Req #3) All these buttons have ActionListeners ---
+     
 
         // 1. Buy HP Button
-//        buyHpButton = new JButton("HP+1 (Cost: " + MyConstants.COST_HP + ")");
         buyHpButton = new JButton();
         buyHpButton.addActionListener(e -> {
             if (score >= MyConstants.COST_HP) {
@@ -310,7 +295,6 @@ public class GameFrame extends JFrame {
         });
 
         // 2. Buy Faster Ship Button
-//        buyFasterShipButton = new JButton("Faster Ship (Cost: " + MyConstants.COST_FASTER_SHIP + ")");
         buyFasterShipButton = new JButton();
         buyFasterShipButton.addActionListener(e -> {
             if (score >= MyConstants.COST_FASTER_SHIP) {
@@ -322,11 +306,11 @@ public class GameFrame extends JFrame {
                     // Check if we just hit the max
                     if (currentPlayerSpeed >= MyConstants.MAX_PLAYER_SPEED) {
                         buyFasterShipButton.setEnabled(false);
-//                        buyFasterShipButton.setText("Ship Speed MAXED");
+
                     }
                 } else {
                     buyFasterShipButton.setEnabled(false);
-//                    buyFasterShipButton.setText("Ship Speed MAXED");
+
                 }
             } else {
                 addGameLog("Not enough score for faster ship!");
@@ -335,7 +319,6 @@ public class GameFrame extends JFrame {
         });
 
 //        // 3. Buy Faster Bullets Button
-//        buyFasterBulletButton = new JButton("Faster Bullets (Cost: " + MyConstants.COST_FASTER_BULLETS + ")");
         buyFasterBulletButton = new JButton();
         buyFasterBulletButton.addActionListener(e -> {
             if (score >= MyConstants.COST_FASTER_BULLETS) {
@@ -344,14 +327,13 @@ public class GameFrame extends JFrame {
                     currentBulletSpeed += MyConstants.UPGRADE_SPEED_AMOUNT; 
                     addGameLog("Bullet Speed Up!");
                     
-                    // Check if we just hit the max
                     if (currentBulletSpeed >= MyConstants.MAX_BULLET_SPEED) {
                         buyFasterBulletButton.setEnabled(false);
-//                        buyFasterBulletButton.setText("Bullet SP MAXED");
+
                     }
                 } else {
                     buyFasterBulletButton.setEnabled(false);
-//                    buyFasterBulletButton.setText("Bullet SP MAXED");
+
                 }
             } else {
                 addGameLog("Not enough score for faster bullets!");
@@ -360,7 +342,6 @@ public class GameFrame extends JFrame {
         });
 
         // 4. Buy Double Shot Button
-//        buyDoubleShotButton = new JButton("Double Shot (Cost: " + MyConstants.COST_DOUBLE_SHOT + ")");
         buyDoubleShotButton = new JButton();
         buyDoubleShotButton.addActionListener(e -> {
             if (score >= MyConstants.COST_DOUBLE_SHOT) {
@@ -368,7 +349,6 @@ public class GameFrame extends JFrame {
                 hasDoubleShot = true;
                 addGameLog("Double Shot active!");
                 ((JButton)e.getSource()).setEnabled(false); // One-time purchase
-//                buyDoubleShotButton.setText("Bought Double Shot");
             } else {
                 addGameLog("Not enough score for Double Shot!");
             }
@@ -376,7 +356,6 @@ public class GameFrame extends JFrame {
         });
         
         // 5. Buy Rapid Bullet Button
-//        buyRapidBulletButton = new JButton("more rapid bullet (Cost: " + MyConstants.COST_MORE_FREQUENCY_BULLETS + ")");
         buyRapidBulletButton = new JButton();
         buyRapidBulletButton.addActionListener(e -> {
             if (score >= MyConstants.COST_MORE_FREQUENCY_BULLETS) {
@@ -388,11 +367,9 @@ public class GameFrame extends JFrame {
                     // Check if we just hit the max
                     if (currentBulletFrequency <= MyConstants.MAX_BULLET_SPEED) {
                         buyRapidBulletButton.setEnabled(false);
-//                        buyRapidBulletButton.setText("Bullet FQ MAXED");
                     }
                 } else {
                     buyRapidBulletButton.setEnabled(false);
-//                    buyRapidBulletButton.setText("Bullet FQ MAXED");
                 }
 
             } else {
@@ -403,7 +380,6 @@ public class GameFrame extends JFrame {
         
 
         // 6. Buy Shield Button
-//        buyShieldButton = new JButton("Shield (Cost: " + MyConstants.COST_SHIELD + ")");
         buyShieldButton = new JButton();
         buyShieldButton.addActionListener(e -> {
             if (score >= MyConstants.COST_SHIELD) {
@@ -420,24 +396,24 @@ public class GameFrame extends JFrame {
             drawpane.requestFocusInWindow();
         });
         
-        // --- NEW: Main Menu Button in South Panel ---
+        // --- Resign Button in South Panel ---
         mainMenuButton = new JButton();
         mainMenuButton.addActionListener(e -> {
             triggerGameOver();
         });
             
         // We add a "Help" button here too.
-        helpButton = new JButton();
-        helpButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(currentFrame, 
-                "Space Defender\n\n- Use A/D or Left/Right arrows to move.\n- Shooting is automatic.\n- Asteroids hitting you or the ground cost 1 HP.\n- Buy upgrades to survive longer!",
-                "Help & Info",
-                JOptionPane.INFORMATION_MESSAGE);
-            drawpane.requestFocusInWindow();
-        });
+//        helpButton = new JButton();
+//        helpButton.addActionListener(e -> {
+//            JOptionPane.showMessageDialog(currentFrame, 
+//                "Space Defender\n\n- Use A/D or Left/Right arrows to move.\n- Shooting is automatic.\n- Asteroids hitting you or the ground cost 1 HP.\n- Buy upgrades to survive longer!",
+//                "Help & Info",
+//                JOptionPane.INFORMATION_MESSAGE);
+//            drawpane.requestFocusInWindow();
+//        });
         
         mainMenuButton.setIcon(new MyImageIcon(MyConstants.FILE_Resign));
-        helpButton.setIcon(new MyImageIcon(MyConstants.FILE_Help));
+        //helpButton.setIcon(new MyImageIcon(MyConstants.FILE_Help));
         buyHpButton.setIcon(new MyImageIcon(MyConstants.FILE_HP));
         buyFasterBulletButton.setIcon(new MyImageIcon(MyConstants.FILE_FasterBullet));
         buyFasterShipButton.setIcon(new MyImageIcon(MyConstants.FILE_FasterShip));
@@ -445,13 +421,14 @@ public class GameFrame extends JFrame {
         buyRapidBulletButton.setIcon(new MyImageIcon(MyConstants.FILE_RapidFire));
         buyShieldButton.setIcon(new MyImageIcon(MyConstants.FILE_Shield));
         
-        RemoveBG.removeBgBtn(mainMenuButton); RemoveBG.removeBgBtn(helpButton);
+        RemoveBG.removeBgBtn(mainMenuButton); 
+        //RemoveBG.removeBgBtn(helpButton);
         RemoveBG.removeBgBtn(buyHpButton); RemoveBG.removeBgBtn(buyFasterBulletButton); RemoveBG.removeBgBtn(buyFasterShipButton);
         RemoveBG.removeBgBtn(buyDoubleShotButton); RemoveBG.removeBgBtn(buyRapidBulletButton); RemoveBG.removeBgBtn(buyShieldButton);
               
         // Alignments
         mainMenuButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-        helpButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        //helpButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         buyHpButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         buyDoubleShotButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         buyFasterBulletButton.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -471,16 +448,16 @@ public class GameFrame extends JFrame {
             }
         });
         
-        helpButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                helpButton.setIcon(new MyImageIcon(MyConstants.FILE_Help_Glow));
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                helpButton.setIcon(new MyImageIcon(MyConstants.FILE_Help));
-            }
-        });
+//        helpButton.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseEntered(MouseEvent e) {
+//                helpButton.setIcon(new MyImageIcon(MyConstants.FILE_Help_Glow));
+//            }
+//            @Override
+//            public void mouseExited(MouseEvent e) {
+//                helpButton.setIcon(new MyImageIcon(MyConstants.FILE_Help));
+//            }
+//        });
         
         buyHpButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -549,29 +526,20 @@ public class GameFrame extends JFrame {
         });
 
         
-//        upgradePanel.add(Box.createRigidArea(new Dimension(20, 0)));
-//        upgradePanel.add(Box.createHorizontalStrut(200));
+
         upgradePanel.add(buyHpButton);
-//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyFasterShipButton);
-//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyFasterBulletButton);
-//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyDoubleShotButton);
-//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyRapidBulletButton);
-//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyShieldButton);
-//        upgradePanel.add(Box.createHorizontalStrut(65));
         upgradePanel.add(buyShieldButton);
-//        upgradePanel.add(Box.createHorizontalStrut(130));
         upgradePanel.add(mainMenuButton);
-        upgradePanel.add(helpButton);
+        //upgradePanel.add(helpButton);
 
         upgradeConsoleImage = new MyImageIcon(MyConstants.FILE_UPGRADE_CONSOLE);
         
         upgradeLabel = new JLabel(upgradeConsoleImage);
-//        upgradeLabel.setLayout(new BoxLayout(upgradeLabel, BoxLayout.Y_AXIS));
         upgradeLabel.setLayout(new BorderLayout());
         upgradeLabel.setOpaque(false);
         
@@ -596,7 +564,7 @@ public class GameFrame extends JFrame {
         gameLogLabel.setLayout(new BorderLayout());
         gameLogLabel.setOpaque(false);
         
-        // (Req #2) JTextArea
+        //JTextArea
         gameLogArea = new JTextArea(1, 1);
         gameLogArea.setEditable(false);
         gameLogArea.setFont(new Font("Monospaced", Font.PLAIN, 10));
@@ -639,7 +607,7 @@ public class GameFrame extends JFrame {
     public void startAsteroidSpawner() {
         Thread spawnerThread = new Thread(() -> {
             try {
-                Thread.sleep(4000);
+                Thread.sleep(3000);
                 while (true) {
                     while (isGameRunning()) {
                         SwingUtilities.invokeLater(() -> {
@@ -658,7 +626,7 @@ public class GameFrame extends JFrame {
     public void startAutoShooter() {
         Thread shooterThread = new Thread(() -> {
             try {
-                Thread.sleep(4000);
+                Thread.sleep(3000);
                 while (true) {
                     while (isGameRunning()) {
                         SwingUtilities.invokeLater(() -> {
@@ -722,14 +690,13 @@ public class GameFrame extends JFrame {
         asteroids.add(asteroid);
     }
 
-    public void fireBullet() {
+    public synchronized void fireBullet() {
         if (!isGameRunning()) return;
 
-       // MySoundEffect fireSound = new MySoundEffect(MyConstants.FILE_LASER_SOUND);
         laserSound.playOnce();
 
-        if (hasDoubleShot) {
-            
+        if (hasDoubleShot) 
+        {            
             int bulletX1 = playerRocket.getX() + (MyConstants.ROCKET_WIDTH / 4) - (MyConstants.BULLET_WIDTH / 2);
             int bulletX2 = playerRocket.getX() + (MyConstants.ROCKET_WIDTH * 3 / 4) - (MyConstants.BULLET_WIDTH / 2);
             int bulletY = playerRocket.getY();
@@ -769,12 +736,16 @@ public class GameFrame extends JFrame {
     public synchronized void checkBulletCollisions(Bullet bullet) {
         if (!bullet.isRunning()) return;
 
-        for (int i = asteroids.size() - 1; i >= 0; i--) {
+        for (int i = asteroids.size() - 1; i >= 0; i--) 
+        {
             Asteroid asteroid = asteroids.get(i);
 
             if (asteroid.isRunning() && bullet.getBounds().intersects(asteroid.getBounds())) {
                 // Collision!
-                explosionSound.playOnce();
+                //explosionSound.playOnce();
+                MySoundEffect s = new MySoundEffect();
+                s.setSound(MyConstants.FILE_EXPLOSION_SOUND);
+                s.playOnce();
 
                 // stop bullet and asteroid movement
                 bullet.stopThread();
@@ -796,8 +767,9 @@ public class GameFrame extends JFrame {
 
                     // 3) Now remove asteroid from GUI and list (on EDT)
                     SwingUtilities.invokeLater(() -> {
-                        removeEntityGUI(hitAsteroid);   // your existing method
-                        asteroids.remove(hitAsteroid);  // remove by object, not index
+                        //removeEntityGUI(hitAsteroid);   // your existing method
+                        //asteroids.remove(hitAsteroid);  // remove by object, not index
+                        removeEntity(hitAsteroid); //same logic of 2 line above.
                         drawpane.revalidate();
                         drawpane.repaint();
                     });

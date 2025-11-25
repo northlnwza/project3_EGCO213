@@ -13,7 +13,6 @@ import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-//import javax.swing.border.EmptyBorder;
 
 public class SettingApplication extends JFrame{
     private MyImageIcon main_backgroundImg;

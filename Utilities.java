@@ -132,7 +132,7 @@ interface MyConstants
     static final int ASTEROID_SPEED = 5; // Pixels per game tick
     static final int BULLET_SPEED = 15; // Pixels per game tick
     static final int ASTEROID_SPAWN_DELAY = 2000; // Milliseconds (3 seconds)
-    static final int PLAYER_FIRE_DELAY = 500; // n millisec / 500 Millis (2 shots per second) 500 default
+    static final int PLAYER_FIRE_DELAY = 500; //500 n millisec / 500 Millis (2 shots per second) 500 default
     static final int UPGRADE_SPEED_AMOUNT = 10; // Speed increase per upgrade
     static final int UPGRADE_BULLET_FREQUENCY_AMOUNT = 10; // Speed decrease per upgrade
 

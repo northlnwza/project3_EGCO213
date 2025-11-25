@@ -6,24 +6,18 @@ Jitchaya Hirunsri 6713222
 Tanop Udomkanaruck 6713233
  */
 
-package Project3_6713118; // Make sure to rename XXX to your ID
+package Project3_6713118;
 
-//import Project3_EGCO213.GameFrame;
 import javax.swing.*;
 
-// This file contains all our "game object" classes.
-// All references to "MainApplication" have been changed to "GameFrame".
-
-// //////////////////////////////////////////////////////////////////////////////
 // Class 1: The Player's Rocket
-// //////////////////////////////////////////////////////////////////////////////
 class PlayerRocket extends JLabel {
-    private GameFrame parentFrame; // Changed from MainApplication
+    private GameFrame parentFrame;
     private MyImageIcon rocketImg;
     private boolean isRunning = true;
     private int curX, curY;
 
-    public PlayerRocket(GameFrame pf) { // Changed from MainApplication
+    public PlayerRocket(GameFrame pf) {
         parentFrame = pf;
         rocketImg = new MyImageIcon(MyConstants.FILE_ROCKET2).resize(MyConstants.ROCKET_WIDTH, MyConstants.ROCKET_HEIGHT);
         setIcon(rocketImg);
@@ -38,8 +32,8 @@ class PlayerRocket extends JLabel {
         if (isRunning)
         {
         curX -= parentFrame.getCurrentPlayerSpeed();
-        if (curX < 0) {
-            curX = 0;
+        if (curX < -5) {
+            curX = -5;
         }
         setLocation(curX, curY);
         }
@@ -61,11 +55,10 @@ class PlayerRocket extends JLabel {
     }
 }
 
-// //////////////////////////////////////////////////////////////////////////////
+
 // Class 2: The Falling Asteroid (Object Thread)
-// //////////////////////////////////////////////////////////////////////////////
 class Asteroid extends JLabel implements Runnable {
-    private GameFrame parentFrame; // Changed from MainApplication
+    private GameFrame parentFrame;
     private MyImageIcon asteroidImg;
     private MyImageIcon explosionImg;
     private int curX, curY;
@@ -108,19 +101,13 @@ class Asteroid extends JLabel implements Runnable {
     
     public void Explosion() { setIcon(explosionImg); }
 
-    /**
-     * COMMAND A: "Destroyed by Bullet"
-     * This is called by checkBulletCollisions.
-     * It *only* stops the thread's loop.
-     * The GameFrame is responsible for removing the GUI and List item.
-     */
     public void stopThreadOnly() 
     {
         isRunning = false;
     }
-    public void stopThreadAndRemoveFromList() {
+    public void stopThreadAndRemoveFromList() 
+    {
         isRunning = false;
-        // This tells GameFrame to remove it from the list AND the GUI
         parentFrame.removeEntity(this);
     }
     
@@ -163,18 +150,16 @@ class Asteroid extends JLabel implements Runnable {
     }
 }
 
-// //////////////////////////////////////////////////////////////////////////////
 // Class 3: The Player's Bullet (Object Thread)
-// //////////////////////////////////////////////////////////////////////////////
 class Bullet extends JLabel implements Runnable {
-    private GameFrame parentFrame; // Changed from MainApplication
+    private GameFrame parentFrame;
     private MyImageIcon bulletImg;
     private MyImageIcon bullet2Img;
     private int curX, curY;
     //private volatile boolean isRunning = true;
     private boolean isRunning = true;
 
-    public Bullet(GameFrame pf, int startX, int startY) { // Changed from MainApplication
+    public Bullet(GameFrame pf, int startX, int startY) {
         parentFrame = pf;
         bulletImg = new MyImageIcon(MyConstants.FILE_BULLET).resize(MyConstants.BULLET_WIDTH, MyConstants.BULLET_HEIGHT);
         bullet2Img = new MyImageIcon(MyConstants.FILE_BULLET2).resize(MyConstants.BULLET_WIDTH, MyConstants.BULLET_HEIGHT);

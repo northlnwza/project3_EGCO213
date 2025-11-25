@@ -4,17 +4,16 @@ Phurinut Wongwatcharapaiboon 6713245
 Jitchaya Hirunsri 6713222
 Tanop Udomkanaruck 6713233
  */
-package Project3_6713118; // Make sure to rename XXX to your ID
+package Project3_6713118;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
-// This is NOW Frame 1, the Main Menu.
-// It satisfies the PDF requirement that the program starts with "MainApplication.java".
+
 public class GameMain extends JFrame {
 
-    // (Req #2) Components
+
     private JTextField playerNameField;
     private JRadioButton[] difficultyRadios;
     private JFrame mainFrame;
@@ -26,14 +25,6 @@ public class GameMain extends JFrame {
     private VolumeManagement vm;
     private MySoundEffect clickedSound;
     
-//    private int i;
-    
-
-//    public static void main(String[] args) {
-        // Run the GUI on the Event Dispatch Thread
-        //SwingUtilities.invokeLater(() -> new MainApplication());
-//        new GameMain();
-//    }
 
     public GameMain(JFrame mainFrame, MySoundEffect backgroundMusic, VolumeManagement vm) {
         
@@ -74,17 +65,14 @@ public class GameMain extends JFrame {
         // --- Title ---
         JLabel titleLabel = new JLabel();
         titleLabel.setIcon(new MyImageIcon(MyConstants.FILE_GameLogo));
-//        titleLabel.add(Box.createRigidArea(new Dimension(0, 100)));
         
 
-        // --- (Req #2) JTextField ---
-//        mainPanel.add(createSectionLabel("Enter Your Name:"));
+
         playerNameField = new JTextField("Player Name");
         playerNameField.setFont(new Font("Arial", Font.PLAIN, 25));
         playerNameField.setMaximumSize(new Dimension(300, 30));
         
         
-        // --- (Req #2) JRadioButton (5+ items) ---
         String[] difficulties = {"Recruit", "Soldier", "Veteran", "Ace", "Impossible"};
         difficultyRadios = new JRadioButton[difficulties.length];
         ButtonGroup difficultyGroup = new ButtonGroup();
@@ -117,21 +105,14 @@ public class GameMain extends JFrame {
                         else 
                             difficultyRadios[j].setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
                     }
-//                    difficultyRadios[i].setIcon(new MyImageIcon(MyConstants.FILE_Selected));
-//                    for(int j = 0; j < difficulties.length; i++) {
-//                        if (j == i) continue;
-//                        else difficultyRadios[i].setIcon(new MyImageIcon(MyConstants.FILE_Unselected));
-//                    }
                 }
             });
         }
         difficultyRadios[1].setSelected(true); // Default to "Soldier"
         radioPanel.setOpaque(false);
-//        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-//        mainPanel.add(Box.createVerticalGlue()); // Pushes start button to bottom
+
 
         
-        // --- (Req #2) JButton that opens another frame ---
         JButton startGameButton = new JButton();
         JButton backGameButton = new JButton();
         
@@ -154,16 +135,13 @@ public class GameMain extends JFrame {
             }
         });
         startGameButton.addActionListener(e -> {
-            // This is the logic that opens Frame 2
             clickedSound.playOnce();
             String playerName = playerNameField.getText();
             String selectedDifficulty = getSelectedDifficulty();
             
-            // Create and show the game frame
             GameFrame gameFrame = new GameFrame(mainFrame, playerName, selectedDifficulty, backgroundMusic, vm);
             gameFrame.setVisible(true);
             mainFrame.setVisible(false);
-            // Close this menu frame
             this.dispose();
         });
 
