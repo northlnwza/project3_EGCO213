@@ -742,10 +742,9 @@ public class GameFrame extends JFrame {
 
             if (asteroid.isRunning() && bullet.getBounds().intersects(asteroid.getBounds())) {
                 // Collision!
-                //explosionSound.playOnce();
-                MySoundEffect s = new MySoundEffect();
-                s.setSound(MyConstants.FILE_EXPLOSION_SOUND);
-                s.playOnce();
+                explosionSound = new MySoundEffect();
+                explosionSound.setSound(MyConstants.FILE_EXPLOSION_SOUND);
+                explosionSound.playOnce();
 
                 // stop bullet and asteroid movement
                 bullet.stopThread();
