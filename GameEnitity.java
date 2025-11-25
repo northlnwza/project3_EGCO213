@@ -169,6 +169,7 @@ class Asteroid extends JLabel implements Runnable {
 class Bullet extends JLabel implements Runnable {
     private GameFrame parentFrame; // Changed from MainApplication
     private MyImageIcon bulletImg;
+    private MyImageIcon bullet2Img;
     private int curX, curY;
     //private volatile boolean isRunning = true;
     private boolean isRunning = true;
@@ -176,12 +177,15 @@ class Bullet extends JLabel implements Runnable {
     public Bullet(GameFrame pf, int startX, int startY) { // Changed from MainApplication
         parentFrame = pf;
         bulletImg = new MyImageIcon(MyConstants.FILE_BULLET).resize(MyConstants.BULLET_WIDTH, MyConstants.BULLET_HEIGHT);
-        setIcon(bulletImg);
+        bullet2Img = new MyImageIcon(MyConstants.FILE_BULLET2).resize(MyConstants.BULLET_WIDTH, MyConstants.BULLET_HEIGHT);
+        setIcon(bullet2Img);
 
         curX = startX;
         curY = startY;
         setBounds(curX, curY, MyConstants.BULLET_WIDTH, MyConstants.BULLET_HEIGHT);
     }
+    
+    public void upgradeBullet() { setIcon(bulletImg); }
 
     public void stopThread() {
         isRunning = false;

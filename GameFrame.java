@@ -729,12 +729,15 @@ public class GameFrame extends JFrame {
         laserSound.playOnce();
 
         if (hasDoubleShot) {
+            
             int bulletX1 = playerRocket.getX() + (MyConstants.ROCKET_WIDTH / 4) - (MyConstants.BULLET_WIDTH / 2);
             int bulletX2 = playerRocket.getX() + (MyConstants.ROCKET_WIDTH * 3 / 4) - (MyConstants.BULLET_WIDTH / 2);
             int bulletY = playerRocket.getY();
             
             Bullet bullet1 = new Bullet(currentFrame, bulletX1, bulletY);
+            bullet1.upgradeBullet();
             Bullet bullet2 = new Bullet(currentFrame, bulletX2, bulletY);
+            bullet2.upgradeBullet();
             
             drawpane.add(bullet1);
             drawpane.add(bullet2);
@@ -814,12 +817,12 @@ public class GameFrame extends JFrame {
                 } else {
                         addGameLog("Hit! " + targetsDestroyed + "/" + targetToWin);
                        }
-                if (targetsDestroyed == targetToWin/2) 
-                {
-                    triggerBreak();
+//                if (targetsDestroyed == targetToWin/2) 
+//                {
+//                    triggerBreak();
 //                    startAutoShooter();
 //                    startAsteroidSpawner();
-                }
+//                }
                 return; // Bullet is destroyed, stop checking other asteroids
             }
         }

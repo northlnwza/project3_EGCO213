@@ -76,6 +76,7 @@ interface MyConstants
     static final String FILE_ASTEROID       = PATH + "asteroid.png";
     static final String FILE_EXPLOSION      = PATH + "explosion.png";
     static final String FILE_BULLET         = PATH + "bullet.png";
+    static final String FILE_BULLET2        = PATH + "bullet2.png";
 
     // game play sound
 //    static final String FILE_THEME_MUSIC            = PATH + "theme.wav";
