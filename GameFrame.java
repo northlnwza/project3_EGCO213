@@ -173,7 +173,7 @@ public class GameFrame extends JFrame {
                 playerHP = 1;
                 minSpawnDelay = 200;   // Ends at "Chaos"
                 targetToWin = 175;
-                difficultyRampFactor = 27; 
+                difficultyRampFactor = 30; 
                 break;
             default: // Default safe values
                 minSpawnDelay = 800;
@@ -968,13 +968,6 @@ public class GameFrame extends JFrame {
         return currentPlayerSpeed;
     }
 
-    // --- NEW SPECIALIZED METHOD ---
-    /**
-     * This method ONLY removes the JLabel from the drawpane.
-     * It is "GUI-safe" and does NOT touch any of the underlying data lists.
-     * This is safe to call from anywhere, even inside an iterator,
-     * because it doesn't modify the list being iterated.
-     */
     public synchronized void removeEntityGUI(JLabel entity) {
         SwingUtilities.invokeLater(() -> {
             drawpane.remove(entity);
@@ -983,12 +976,7 @@ public class GameFrame extends JFrame {
         });
     }
 
-    /**
-     * This is the "full" remove method.
-     * It removes an entity from the GUI *and* its tracking list.
-     * This is called when an entity dies "on its own" (hits ground, player, etc.)
-     * IT MUST NOT be called from inside an iterator loop.
-     */
+
         public synchronized void removeEntity(JLabel entity) {
             // 1. Remove the visuals
             removeEntityGUI(entity); 
