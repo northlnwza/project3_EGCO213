@@ -175,8 +175,8 @@ public class GameFrame extends JFrame {
             case "Impossible":
                 playerHP = 1;
                 minSpawnDelay = 200;   // Ends at "Chaos"
-                targetToWin = 100;
-                difficultyRampFactor = 50; 
+                targetToWin = 175;
+                difficultyRampFactor = 27; 
                 break;
             default: // Default safe values
                 minSpawnDelay = 800;
