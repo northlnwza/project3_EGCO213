@@ -14,6 +14,7 @@ import javax.swing.*;
 
 class MainApplication extends JFrame 
 {
+    // components
     private JPanel             contentpane;
     private JLabel             drawpane;
     private MyImageIcon        main_backgroundImg;
