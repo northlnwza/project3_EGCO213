@@ -195,11 +195,18 @@ public class GameFrame extends JFrame {
     public void openSettingsMenu() {
         this.setVisible(false);
         
+        for (Asteroid a : asteroids) { a.setPause(true); }
+        for (Bullet b : bullets) { b.setPause(true); }
+        
+        setGameRunning(false);
+        
         SettingApplication settings = new SettingApplication(this, themeSound, vm);
         settings.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-
+                setGameRunning(true);
+                for (Asteroid a : asteroids) { a.setPause(false); }
+                for (Bullet b : bullets) { b.setPause(false); }
                 drawpane.requestFocusInWindow(); 
             }
         });
@@ -232,9 +239,7 @@ public class GameFrame extends JFrame {
                     playerRocket.moveRight();
                 }else if (keyCode == KeyEvent.VK_ESCAPE) 
                 {
-                    setGameRunning(false);
                     openSettingsMenu();
-                    setGameRunning(true);
                 }
             }
         });

@@ -66,6 +66,7 @@ class Asteroid extends JLabel implements Runnable {
     private int width, height; // Instance size
     //private volatile boolean isRunning = true;
     private boolean isRunning = true;
+    private boolean isPause = false;
 
     public Asteroid(GameFrame pf, int startX, int type) 
     {
@@ -111,13 +112,16 @@ class Asteroid extends JLabel implements Runnable {
         parentFrame.removeEntity(this);
     }
     
-    public boolean isRunning() {
-        return isRunning;
-    }
+    public boolean isRunning() { return isRunning; }
+    
+    public void setPause(boolean b) { isPause = b; }
 
     @Override
     public void run() {
         while (isRunning && parentFrame.isGameRunning()) {
+            
+            while (isPause) { try { Thread.sleep(100); } catch (InterruptedException e) {} }
+            
             //curY += MyConstants.ASTEROID_SPEED;
             curY += speed;
             setLocation(curX, curY);
@@ -158,6 +162,7 @@ class Bullet extends JLabel implements Runnable {
     private int curX, curY;
     //private volatile boolean isRunning = true;
     private boolean isRunning = true;
+    private boolean isPause = false;
 
     public Bullet(GameFrame pf, int startX, int startY) {
         parentFrame = pf;
@@ -177,13 +182,16 @@ class Bullet extends JLabel implements Runnable {
         parentFrame.removeEntity(this);
     }
 
-    public boolean isRunning() {
-        return isRunning;
-    }
+    public boolean isRunning() { return isRunning; }
+    
+    public void setPause(boolean b) { isPause = b; }
 
     @Override
     public void run() {
         while (isRunning && parentFrame.isGameRunning()) {
+            
+            while (isPause) { try { Thread.sleep(100); } catch (InterruptedException e) {} }
+            
             curY -= parentFrame.getCurrentBulletSpeed();
             setLocation(curX, curY);
 
